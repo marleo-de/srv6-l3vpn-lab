@@ -1,0 +1,26 @@
+site_name: SRv6 L3VPN Lab
+site_description: IOS XR 25.1.1 – SRv6 uSID und IPv4 L3VPN
+site_url: https://marleo-de.github.io/srv6-l3vpn-lab/
+repo_url: https://github.com/marleo-de/srv6-l3vpn-lab
+repo_name: marleo-de/srv6-l3vpn-lab
+theme:
+  name: material
+  language: de
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - search.suggest
+    - content.tabs.link
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+nav:
+  - Start: index.md
+  - Topologie & Adressen: topologie.md
+  - Underlay prüfen: underlay.md
+  - L3VPN konfigurieren: l3vpn.md
+  - Verifikation & Fehlersuche: verifikation.md
+  - Weitere Ausbaustufen: erweiterungen.md
