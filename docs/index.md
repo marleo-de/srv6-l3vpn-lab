@@ -6,8 +6,8 @@ Diese Dokumentation erweitert den bereits durchgeführten SRv6-Leitfaden um ein 
 
 ## Zielbild
 
-- Zwei zunächst aktive Provider-Edges: **XRv-1** und **XRv-9**
-- Zwei angeschlossene Kundengeräte: **Client-11** und **Client-91**
+- Zwei zunächst aktive Provider-Edges: **XRv-1** und **XRv-10**
+- Zwei angeschlossene Kundengeräte: **Client-11** und **Client-101**
 - VRF **KUNDE_A**, BGP AS **65000**, Route Target **65000:100**
 - VPNv4-Routenaustausch via iBGP zwischen IPv6-Loopbacks
 - SRv6-Service-SID je VRF (**uDT4**) aus dem vorhandenen uSID-Locator
