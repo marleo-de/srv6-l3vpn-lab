@@ -34,10 +34,14 @@ show bgp vpnv4 unicast
 
 ## Test 4: Ende-zu-Ende
 
-- Von Client-11 das LAN auf Client-91 erreichen.
-- Von Client-91 die Gegenrichtung testen.
+- Von Client-11 das LAN auf Client-101 erreichen.
+- Von Client-101 die Gegenrichtung testen.
 - Wenn kein echtes LAN hinter CEs vorhanden ist, geeignete CE-Loopbacks als /32-Testnetze nutzen und die statischen Routen entsprechend anpassen.
 - Optional `ping vrf KUNDE_A` vom PE aus (plattformabhängige Befehlsargumente mit `?` prüfen).
+
+## Getrennte Mandanten prüfen
+
+Nach Einrichtung der [zweiten VRF KUNDE_B](kunde-b.md) sicherstellen, dass Routen mit RT `65000:200` **nicht** in `KUNDE_A` erscheinen. Kundentests zwischen A und B müssen ohne Route Leaking fehlschlagen. Auch die beiden CE-Anschlüsse müssen durch getrennte Routingtabellen isoliert sein.
 
 ## Fehlersuchmatrix
 
@@ -51,4 +55,4 @@ show bgp vpnv4 unicast
 | Nur bei Ausfall Probleme | IS-IS-Unterlay, TI-LFA-Backup und Konvergenz separat untersuchen |
 
 !!! danger "Nicht verwechseln"
-    Ein funktionierendes MP-BGP VPNv4 beweist **nicht**, dass SRv6-L3VPN in der virtuellen XRv-10000-Datenebene funktioniert. Der Erfolgsnachweis erfordert eine tatsächlich weiterleitende uDT4-SID und beidseitigen Kundendatenverkehr.
+    Ein funktionierendes MP-BGP VPNv4 beweist **nicht**, dass SRv6-L3VPN in der virtuellen XRv-9000-Datenebene funktioniert. Der Erfolgsnachweis erfordert eine tatsächlich weiterleitende uDT4-SID und beidseitigen Kundendatenverkehr.
