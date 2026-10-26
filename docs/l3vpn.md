@@ -163,6 +163,8 @@ show segment-routing srv6 sid
 
 Wenn BGP zwar VPNv4-Routen austauscht, aber keine uDT4-Service-SID installiert wird, **nicht** die Datenebene als erfolgreich bewerten. Weiter bei [Verifikation](verifikation.md).
 
+Nach erfolgreicher Prüfung folgt die [zweite VRF KUNDE_B](kunde-b.md) auf Interface `Gi0/0/0/5`.
+
 ## Quelle für die Syntax
 
 [Cisco NCS 5500 IOS XR 25.x, Abschnitt IPv4-L3VPN über SRv6 Micro-SIDs](https://www.cisco.com/c/en/us/td/docs/iosxr/ncs5500/segment-routing/25xx/configuration/guide/b-segment-routing-cg-ncs5500-25xx.pdf). Die konkrete Plattformunterstützung von XRv 9000 bleibt offen.
