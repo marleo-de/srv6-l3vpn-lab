@@ -2,7 +2,7 @@
 
 Nach erfolgreichem Basis-L3VPN:
 
-1. **Zweite VRF `KUNDE_B`:** neue Route Targets (z. B. 65000:200), zwei weitere angeschlossene Kundenstandorte. Bewusst überlappende IPv4-Kundennetze nutzen und Isolation prüfen.
+1. **[Zweite VRF `KUNDE_B`](kunde-b.md):** ist jetzt als eigenständige Lab-Phase dokumentiert. Danach bewusst überlappende IPv4-Kundennetze nutzen und Isolation prüfen.
 2. **PE–CE eBGP:** statische Routen durch dynamischen Austausch ersetzen; Redistribution kontrollieren.
 3. **Mehr PEs:** zusätzliche Standorte an vorhandenen Client-Routern nutzen.
 4. **Route Reflector:** einen Core-Router ergänzend als BGP-RR für VPNv4 einsetzen; er muss dafür nicht selbst CE-VRFs führen.
