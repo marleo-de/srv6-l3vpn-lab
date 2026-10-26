@@ -22,5 +22,6 @@ nav:
   - Topologie & Adressen: topologie.md
   - Underlay prüfen: underlay.md
   - L3VPN konfigurieren: l3vpn.md
+  - Zweite VRF KUNDE_B: kunde-b.md
   - Verifikation & Fehlersuche: verifikation.md
   - Weitere Ausbaustufen: erweiterungen.md
