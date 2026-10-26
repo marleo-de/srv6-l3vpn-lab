@@ -22,7 +22,8 @@ Diese Dokumentation erweitert den bereits durchgeführten SRv6-Leitfaden um ein 
 2. [Vorhandenes Underlay verifizieren](underlay.md)
 3. [VRF, PE-Interfaces, MP-BGP und SRv6 konfigurieren](l3vpn.md)
 4. [Control-Plane und Datenebene prüfen](verifikation.md)
-5. [Weiterführende Testfälle](erweiterungen.md)
+5. [Zweite VRF KUNDE_B auf den zweiten CE-Ports](kunde-b.md)
+6. [Weiterführende Testfälle](erweiterungen.md)
 
 !!! info "Kennzeichnung"
     Mit **LAB-WERT ERSETZEN** markierte Interface-Nummern oder IP-Adressen können aus dem vorliegenden Leitfaden nicht sicher abgeleitet werden. Zuerst auf dem jeweiligen Gerät mit `show interfaces brief` beziehungsweise `show running-config interface` ermitteln.
