@@ -57,8 +57,8 @@ Die roten Nummern sind **nicht** die letzten Ziffern der IPv4-Adressen. Vor der 
 | PE–CE XRv-1 Port 4 | `172.16.11.1/30` ↔ Client-11 `172.16.11.2/30` |
 | PE–CE XRv-10 Port 4 | `172.16.101.1/30` ↔ Client-101 `172.16.101.2/30` |
 
-Die IPv4-Adressen sind *neu vorgeschlagene* Lab-Adressen. Port 5 ist physisch bereits angeschlossen, bleibt im Basistest aber zunächst **unkonfiguriert**.
+Die IPv4-Adressen sind *neu vorgeschlagene* Lab-Adressen. Port 5 ist physisch bereits angeschlossen und wird in der [zweiten VRF KUNDE_B](kunde-b.md) verwendet.
 
 ## Später
 
-Port 5 eignet sich für die zweite VRF `KUNDE_B`, sobald die Basis-SID und Datenebene verifiziert sind.
+**KUNDE_B:** Port 5, RT `65000:200`, RD `65000:12`/`65000:102`, PE-CE `172.16.12.0/30` bzw. `172.16.102.0/30`, CE-Test-LAN `192.168.12.0/24` und `192.168.102.0/24`. Siehe [Konfiguration](kunde-b.md). CE-Router benötigen dafür VRF-Lite oder getrennte Routingkontexte.
