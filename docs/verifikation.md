@@ -16,11 +16,11 @@ show running-config router bgp 65000
 
 ```cisco
 show route vrf KUNDE_A
-show route vrf KUNDE_A 192.168.91.0/24
+show route vrf KUNDE_A 192.168.101.0/24
 show route vrf KUNDE_A 192.168.11.0/24
 ```
 
-Auf XRv-1 sollte `192.168.11.0/24` lokal (statisch) und `192.168.91.0/24` remote (BGP) erscheinen; auf XRv-9 umgekehrt.
+Auf XRv-1 sollte `192.168.11.0/24` lokal (statisch) und `192.168.101.0/24` remote (BGP) erscheinen; auf XRv-10 umgekehrt.
 
 ## Test 3: SRv6-Service-SID
 
@@ -51,4 +51,4 @@ show bgp vpnv4 unicast
 | Nur bei Ausfall Probleme | IS-IS-Unterlay, TI-LFA-Backup und Konvergenz separat untersuchen |
 
 !!! danger "Nicht verwechseln"
-    Ein funktionierendes MP-BGP VPNv4 beweist **nicht**, dass SRv6-L3VPN in der virtuellen XRv-9000-Datenebene funktioniert. Der Erfolgsnachweis erfordert eine tatsächlich weiterleitende uDT4-SID und beidseitigen Kundendatenverkehr.
+    Ein funktionierendes MP-BGP VPNv4 beweist **nicht**, dass SRv6-L3VPN in der virtuellen XRv-10000-Datenebene funktioniert. Der Erfolgsnachweis erfordert eine tatsächlich weiterleitende uDT4-SID und beidseitigen Kundendatenverkehr.
