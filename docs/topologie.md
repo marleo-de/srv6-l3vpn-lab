@@ -6,7 +6,7 @@ Die roten Portnummern auf Seite 3 des SRv6-Leitfadens kennzeichnen `GigabitEther
 
 | PE | PE-Interface | CE | CE-Interface | VPN |
 |---|---|---|---|---|
-| **XRv-5** | `Gi0/0/0/4` | **Client-51** | `Gi0/0` | KUNDE_A |
+| **XRv-5** | `Gi0/0/0/4` – `10.5.51.5/24` | **Client-51** | `Gi0/0` – `10.5.51.51/24` | KUNDE_A |
 | **XRv-5** | `Gi0/0/0/5` | **Client-51** | `Gi0/1` | KUNDE_B |
 | XRv-10 | `Gi0/0/0/4` | Client-101 | `Gi0/0` | KUNDE_A |
 | XRv-10 | `Gi0/0/0/5` | Client-101 | `Gi0/1` | KUNDE_B |
@@ -26,7 +26,7 @@ Der aktuelle Screenshot zeigt:
 | `Gi0/0` | **`10.5.51.51/24`** | `description XRv-5 Gi4`, kein Shutdown |
 | `Gi0/1` | keine IPv4-Adresse | `description XRv-5 Gi5`, **shutdown** |
 
-**Noch offen:** `XRv-5 Gi0/0/0/4` – die PE-IP ist noch nicht per Routerausgabe belegt. Nicht aus dem Namensschema raten. `XRv-5 Gi0/0/0/5` ebenfalls vor Änderung prüfen.
+**Jetzt bestätigt:** `XRv-5 Gi0/0/0/4 = 10.5.51.5/24` mit Beschreibung `Client-51 Gi0/0`; `Gi0/0/0/5` ist `shutdown` und hat keine IPv4-Adresse. Darüber hinaus ist `Gi0/0/0/3 = 10.5.6.5/24` Richtung XRv-6 belegt.
 
 ## Bestätigte Ist-Konfiguration: XRv-10 und Client-101
 
