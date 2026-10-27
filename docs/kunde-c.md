@@ -128,9 +128,9 @@ router static
 commit
 ```
 
-## 6. MP-BGP VPNv4 – Peer XRv-4 ↔ XRv-7
+## 6. MP-BGP VPNv4 – beide PEs peeren mit RR XRv-6
 
-Die beiden PEs benötigen für dieses Zwei-Standort-VPN nur eine direkte iBGP-VPNv4-Session. **Weitere PE-Peers sind für diese neue VRF nicht erforderlich**, solange kein Route Reflector oder andere Dienste hinzukommen.
+**Kein direktes XRv-4 ↔ XRv-7 VPNv4-Peering:** XRv-6 ist der zentrale [Route Reflector](route-reflector.md); beide PEs peeren ausschließlich mit XRv-6.
 
 **XRv-4**:
 
@@ -140,7 +140,7 @@ router bgp 65000
  bgp router-id 1.1.1.4
  address-family vpnv4 unicast
  !
- neighbor 2001:db8:1:1::7
+ neighbor 2001:db8:1:1::6
   remote-as 65000
   update-source Loopback0
   address-family vpnv4 unicast
@@ -168,7 +168,7 @@ router bgp 65000
  bgp router-id 1.1.1.7
  address-family vpnv4 unicast
  !
- neighbor 2001:db8:1:1::4
+ neighbor 2001:db8:1:1::6
   remote-as 65000
   update-source Loopback0
   address-family vpnv4 unicast
