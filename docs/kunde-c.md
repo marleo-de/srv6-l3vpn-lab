@@ -1,5 +1,8 @@
 # Phase 5 – Dritte VRF KUNDE_C: Client-41 und Client-71
 
+!!! info "BGP-Ziel statt statischer Dauerlösung"
+    Die alten Dateien enthalten eBGP mit Client-AS 41 und 71 und historischem Provider-AS 8412. Das neue Lab soll eBGP ergänzen; die statischen Konfigurationen hier sind vorläufige Testvarianten. [BGP-Plan](bgp-plan.md).
+
 Mit dieser Erweiterung erhalten **Client-41** und **Client-71** ein eigenes IPv4-L3VPN `KUNDE_C`, getrennt von `KUNDE_A` und `KUNDE_B`.
 
 !!! warning "Noch nicht bestätigte Adressen"
