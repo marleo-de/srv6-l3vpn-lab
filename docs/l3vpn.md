@@ -1,11 +1,11 @@
-# Phase 2 – IPv4-L3VPN über SRv6
+# VRF KUNDE_A – Client-51 ↔ Client-101
 
-!!! warning "Lab-Konfiguration – nicht blind einspielen"
-    Die CE-Ports stammen aus Seite 3; KUNDE_A-Adressen sind inzwischen aus den Screenshots bestätigt. Nur neue BGP-/VRF-/SRv6-Kommandos sind ungetestet. Cisco dokumentiert die VPNv4/uDT4-Konfiguration für andere IOS-XR-Hardwarefamilien; XRv 9000 muss in diesem Lab praktisch geprüft werden.
+**PE-Paar:** XRv-5 ↔ XRv-10. **Route Target:** `65000:100`. **Provider-AS:** `65000`.
 
-## 1. Kundenseitige VRF (beide PEs)
+!!! warning "Vor der Konfiguration prüfen"
+    **Client-51 `Gi0/0=10.5.51.51/24` und Loopback104 `51.1.0.1/16` sind bestätigt.** Die tatsächliche IP auf **XRv-5 `Gi0/0/0/4` ist noch unbekannt**. Daher enthält dieses Kapitel dort ausdrücklich einen Platzhalter. Erst `show running-config interface GigabitEthernet0/0/0/4` auf XRv-5 lesen und dann diesen Wert einsetzen. Der IPv6/uSID-Transport und die SRv6-L3VPN-Unterstützung von XRv 9000 müssen ebenfalls geprüft werden.
 
-Auf **XRv-1** und **XRv-10**:
+## 1. VRF auf XRv-5 und XRv-10
 
 ```cisco
 configure
@@ -22,31 +22,25 @@ vrf KUNDE_A
 commit
 ```
 
-Prüfen:
+## 2. Kundenseitige PE-Interfaces
+
+**XRv-5 – bestehende IP-Adresse zuerst ermitteln; diesen Block nicht unverändert einfügen:**
 
 ```cisco
-show vrf KUNDE_A
-show running-config vrf KUNDE_A
+show running-config interface GigabitEthernet0/0/0/4
 ```
-
-!!! warning "Vorhandene CE-IP-Adressen beibehalten"
-    Beide Links wurden durch Screenshots bestätigt: XRv-1/Client-11 `10.1.11.1/24` ↔ `10.1.11.11/24`, XRv-10/Client-101 `10.10.101.10/24` ↔ `10.10.101.101/24`. Die VRF-Zuordnung eines Interfaces kann bestehende IPv4-Adressen entfernen. Vor dem Commit den Ist-Zustand und die Auswirkung auf bestehendes Routing prüfen.
-
-## 2. Kundenseitige Interfaces
-
-**XRv-1** – Port 4 aus der PDF, vorab Status prüfen:
 
 ```cisco
 configure
 interface GigabitEthernet0/0/0/4
  vrf KUNDE_A
- ipv4 address 10.1.11.1 255.255.255.0
+ ipv4 address <BESTEHENDE_XRv5_Gi4_IP> 255.255.255.0
  no shutdown
 !
 commit
 ```
 
-**XRv-10** – Port 4 aus der Topologiegrafik, vorab Status prüfen:
+**XRv-10 – bereits bestätigte IP:**
 
 ```cisco
 configure
@@ -58,27 +52,26 @@ interface GigabitEthernet0/0/0/4
 commit
 ```
 
-Bei einer bereits vorhandenen Interface-Konfiguration erst Kollisionen mit IP-Adressen, CDP und VRFs prüfen. IOS XR kann für die VRF-Zuweisung auf bestehenden Interfaces vorheriges Entfernen der IPv4-Adresse verlangen.
+!!! danger "VRF-Zuweisung kann Adressen entfernen"
+    IOS XR kann die IPv4-Adresse beim Wechsel von globaler Tabelle in VRF entfernen. Die bestehende Konfiguration vorher sichern. Das Unterlay (IS-IS) nicht an die CE-Interfaces hängen.
 
-## 3. CE-Adressen und statische Routen
+## 3. Statische PE-Routen zu den Testnetzen
 
-Bestätigte CE-Adressen: Client-11 `10.1.11.11/24`, Loopback104 `11.1.0.1/16`; Client-101 `10.10.101.101/24`, Loopback104 `101.1.0.1/16`. Die folgenden statischen PE-Routen zeigen auf die vorhandenen CE-Adressen. Sie ersetzen keine eventuell schon eingerichtete dynamische Route; vor dem Commit die Routingtabelle und die vorhandene statische Konfiguration prüfen.
-
-**XRv-1**:
+**XRv-5 – Client-51 ist über `10.5.51.51` erreichbar:**
 
 ```cisco
 configure
 router static
  vrf KUNDE_A
   address-family ipv4 unicast
-   11.1.0.0/16 10.1.11.11
+   51.1.0.0/16 10.5.51.51
   !
  !
 !
 commit
 ```
 
-**XRv-10**:
+**XRv-10 – Client-101:**
 
 ```cisco
 configure
@@ -92,16 +85,14 @@ router static
 commit
 ```
 
-## 4. MP-BGP VPNv4 und uDT4 (per VRF)
+## 4. MP-BGP VPNv4 und SRv6-Service-SIDs
 
-Die VPNv4-Nachbarschaft nutzt **IPv6-Loopbacks als Transport**. Die Route Targets unter `vrf` steuern den Import/Export, die RDs in BGP unterscheiden die VPN-Routen.
-
-**XRv-1**:
+**XRv-5:**
 
 ```cisco
 configure
 router bgp 65000
- bgp router-id 1.1.1.1
+ bgp router-id 1.1.1.5
  address-family vpnv4 unicast
  !
  neighbor 2001:db8:1:1::10
@@ -111,7 +102,7 @@ router bgp 65000
   !
  !
  vrf KUNDE_A
-  rd 65000:11
+  rd 65000:51
   address-family ipv4 unicast
    redistribute static
    segment-routing srv6
@@ -124,7 +115,7 @@ router bgp 65000
 commit
 ```
 
-**XRv-10**:
+**XRv-10:**
 
 ```cisco
 configure
@@ -132,7 +123,7 @@ router bgp 65000
  bgp router-id 1.1.1.10
  address-family vpnv4 unicast
  !
- neighbor 2001:db8:1:1::1
+ neighbor 2001:db8:1:1::5
   remote-as 65000
   update-source Loopback0
   address-family vpnv4 unicast
@@ -152,22 +143,22 @@ router bgp 65000
 commit
 ```
 
-!!! info "Warum pro VRF?"
-    `alloc mode per-vrf` wählt in der dokumentierten Cisco-Implementierung für IPv4-L3VPN das uDT4-Verhalten: eine servicegebundene SID je VRF statt einer SID pro Präfix. Keine manuelle SID fest vorgeben.
+Die dokumentierte Implementierung nutzt `alloc mode per-vrf` für eine servicebezogene SRv6-SID (uDT4). **Die XRv-9000-Datenebene ist dafür noch nicht verifiziert.**
 
-## 5. Freigabe vor dem nächsten Schritt
+## 5. CE-Konfiguration: IOSv und VRF-Lite
+
+Da **dieselben CEs auch KUNDE_B bedienen**, müssen die Routingtabellen auf Client-51 und Client-101 getrennt werden. Die bestehenden Loopback104 müssen in die **CE-VRF KUNDE_A** verschoben werden. Sonst liegen die Kundennetze weiterhin in der globalen Tabelle.
+
+Die CE-VRF-Lite-Schritte samt Risiken und Routingtrennung sind unter [KUNDE_B](kunde-b.md) beschrieben. CE-Befehle sind klassische IOS-Befehle, nicht IOS XR.
+
+## 6. Verifikation
 
 ```cisco
+show vrf KUNDE_A
+show route vrf KUNDE_A
 show bgp vpnv4 unicast summary
 show bgp vpnv4 unicast
-show route vrf KUNDE_A
 show segment-routing srv6 sid
 ```
 
-Wenn BGP zwar VPNv4-Routen austauscht, aber keine uDT4-Service-SID installiert wird, **nicht** die Datenebene als erfolgreich bewerten. Weiter bei [Verifikation](verifikation.md).
-
-Nach erfolgreicher Prüfung folgt die [zweite VRF KUNDE_B](kunde-b.md) auf Interface `Gi0/0/0/5`.
-
-## Quelle für die Syntax
-
-[Cisco NCS 5500 IOS XR 25.x, Abschnitt IPv4-L3VPN über SRv6 Micro-SIDs](https://www.cisco.com/c/en/us/td/docs/iosxr/ncs5500/segment-routing/25xx/configuration/guide/b-segment-routing-cg-ncs5500-25xx.pdf). Die konkrete Plattformunterstützung von XRv 9000 bleibt offen.
+Erwartung: auf XRv-5 `51.1.0.0/16` als lokale statische Route und `101.1.0.0/16` als VPNv4/BGP-Route; auf XRv-10 umgekehrt. Zusätzlich eine funktionsfähige SRv6-Service-SID und **beidseitige** CE-Konnektivität. Für die zu testende Rückroute auf den CEs siehe [Verifikation](verifikation.md).
