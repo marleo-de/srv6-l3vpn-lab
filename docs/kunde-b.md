@@ -154,12 +154,12 @@ Damit soll jede VRF eine eigene SRv6-Service-SID mit uDT4-Verhalten erhalten. **
 
 Auf **Client-11**:
 
-- `G0/0` in CE-VRF `KUNDE_A`, IPv4 `172.16.11.2/30`, Default/Route über `172.16.11.1`
+- `G0/0` in CE-VRF `KUNDE_A`, IPv4 `10.1.11.11/24`, Remote-Route über `10.1.11.1`
 - `G0/1` in CE-VRF `KUNDE_B`, IPv4 `172.16.12.2/30`, Default/Route über `172.16.12.1`
 
 Auf **Client-101**:
 
-- `G0/0` in CE-VRF `KUNDE_A`, IPv4 `172.16.101.2/30`, Default/Route über `172.16.101.1`
+- `G0/0` in CE-VRF `KUNDE_A`, IPv4 `10.10.101.101/24`, Remote-Route über `10.10.101.10`
 - `G0/1` in CE-VRF `KUNDE_B`, IPv4 `172.16.102.2/30`, Default/Route über `172.16.102.1`
 
 **Client-11 läuft mit Cisco IOSv 15.9(3)M4 (`vios-adventerprisek9-m`).** Für die CE-Konfiguration gilt klassische Cisco-IOS-Syntax (`configure terminal`, `ip vrf` bzw. je nach Parser `vrf definition`, `ip vrf forwarding` bzw. `vrf forwarding`, und `write memory`). Die genaue VRF-Lite-Befehlssyntax und Unterstützung bitte auf dem IOSv-Gerät mit `vrf ?` / `ip vrf ?` prüfen, bevor die CE-Konfiguration übernommen wird. `Client-101` wird als IOSv angenommen und sollte mit `show version` gegengeprüft werden.
