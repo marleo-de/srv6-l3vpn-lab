@@ -3,7 +3,7 @@
 **PE-Paar:** XRv-5 ↔ XRv-10. **Route Target:** `65000:100`. **Provider-AS:** `65000`.
 
 !!! warning "Vor der Konfiguration prüfen"
-    **Client-51 `Gi0/0=10.5.51.51/24` und Loopback104 `51.1.0.1/16` sind bestätigt.** Die tatsächliche IP auf **XRv-5 `Gi0/0/0/4` ist noch unbekannt**. Daher enthält dieses Kapitel dort ausdrücklich einen Platzhalter. Erst `show running-config interface GigabitEthernet0/0/0/4` auf XRv-5 lesen und dann diesen Wert einsetzen. Der IPv6/uSID-Transport und die SRv6-L3VPN-Unterstützung von XRv 9000 müssen ebenfalls geprüft werden.
+    XRv-5 `Gi0/0/0/4 = 10.5.51.5/24`, Client-51 `Gi0/0 = 10.5.51.51/24` und Loopback104 `51.1.0.1/16` sind nun per Screenshot bestätigt. Die VRF-Zuweisung kann die bisherige Interface-IP entfernen; die Adresse im selben Änderungsschritt wieder setzen. SRv6-uDT4-Funktion auf XRv 9000 bleibt separat zu prüfen.
 
 ## 1. VRF auf XRv-5 und XRv-10
 
