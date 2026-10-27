@@ -58,7 +58,7 @@ Die roten Nummern sind **nicht** die letzten Ziffern der IPv4-Adressen. Vor der 
 | GigabitEthernet0/0 | `10.1.11.11/24` | Verbindung zu XRv-1 `Gi0/0/0/4`; derzeit im globalen Routing |
 | GigabitEthernet0/1 | Keine IPv4-Adresse | Verbindung zu XRv-1 `Gi0/0/0/5`; vorgesehen für KUNDE_B |
 
-**Wichtig:** Der tatsächliche IP-Wert auf XRv-1 Port 4 wurde noch nicht gezeigt. Für KUNDE_A sollen die vorhandenen Adressen möglichst bestehen bleiben. Die bisher vorgeschlagenen `172.16.11.0/30`-Adressen wären ein *Umbau*, nicht der Ist-Zustand. Ob Loopback104 bereits über ein Protokoll advertised wird, geht aus der gezeigten Konfiguration nicht hervor.
+**Nachträglich bestätigt:** XRv-1 Port 4 hat `10.1.11.1/24`. Für KUNDE_A sollen die vorhandenen Adressen möglichst bestehen bleiben. Die bisher vorgeschlagenen `172.16.11.0/30`-Adressen wären ein *Umbau*, nicht der Ist-Zustand. Ob Loopback104 bereits über ein Protokoll advertised wird, geht aus der gezeigten Konfiguration nicht hervor.
 
 ## Bestätigte PE-Seite: XRv-1
 
@@ -89,21 +89,19 @@ Die Verbindung `XRv-1 Gi0/0/0/4 ↔ Client-11 Gi0/0` besitzt damit das vorhanden
 
 Die beiden `Gi0/0/0/5`-Ports sind für KUNDE_B vorgesehen, aktuell aber **shutdown**. Auf Client-101 ist auch `Gi0/1` shutdown.
 
-## Neue Kundennetz-Adressen (ursprünglicher Vorschlag – noch nicht anwenden)
+## Bestätigter Adressplan KUNDE_A
 
-| Einstellung | Wert |
-|---|---|
-| Provider-AS | `65000` |
-| VRF | `KUNDE_A` |
-| Route Target Import/Export | `65000:100` |
-| RD auf XRv-1 | `65000:11` |
-| RD auf XRv-10 | `65000:101` |
-| LAN hinter Client-11 | `192.168.11.0/24` |
-| LAN hinter Client-101 | `192.168.101.0/24` |
-| PE–CE XRv-1 Port 4 | `172.16.11.1/30` ↔ Client-11 `172.16.11.2/30` |
-| PE–CE XRv-10 Port 4 | `172.16.101.1/30` ↔ Client-101 `172.16.101.2/30` |
+| Standort | PE-IP | CE-IP | IPv4-Testnetz |
+|---|---|---|---|
+| XRv-1 / Client-11 | `10.1.11.1/24` | `10.1.11.11/24` | `11.1.0.0/16` |
+| XRv-10 / Client-101 | `10.10.101.10/24` | `10.10.101.101/24` | `101.1.0.0/16` |
 
-Die IPv4-Adressen sind *neu vorgeschlagene* Lab-Adressen. Port 5 ist physisch bereits angeschlossen und wird in der [zweiten VRF KUNDE_B](kunde-b.md) verwendet.
+Die früheren Adressvorschläge `172.16.11.0/30`, `172.16.101.0/30`, `192.168.11.0/24` und `192.168.101.0/24` sind **verworfen**.
+
+## Weitere VPNs
+
+- [KUNDE_B](kunde-b.md): XRv-1 / XRv-10, Port 5, eigenständiger VPN-Dienst.
+- [KUNDE_C](kunde-c.md): XRv-4 / XRv-7, Client-41 / Client-71, eigener RT `65000:300`. Die CE-IP-Adressen fehlen noch.
 
 ## Später
 
