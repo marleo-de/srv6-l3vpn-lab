@@ -26,6 +26,7 @@ nav:
       - "VRF KUNDE_A · Client-51 ↔ 101": l3vpn.md
       - "VRF KUNDE_B · Client-51 ↔ 101": kunde-b.md
       - "VRF KUNDE_C · Client-41 ↔ 71": kunde-c.md
+  - BGP-Konzept & Migration: bgp-plan.md
   - Tests & Ausbau:
       - Verifikation & Fehlersuche: verifikation.md
       - Weitere Ausbaustufen: erweiterungen.md
