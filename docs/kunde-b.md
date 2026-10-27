@@ -156,7 +156,7 @@ Auf **Client-101**:
 - `G0/0` in CE-VRF `KUNDE_A`, IPv4 `172.16.101.2/30`, Default/Route über `172.16.101.1`
 - `G0/1` in CE-VRF `KUNDE_B`, IPv4 `172.16.102.2/30`, Default/Route über `172.16.102.1`
 
-Die CE-Befehle hängen vom tatsächlichen Client-Image ab und sind bewusst nicht als IOS-XR-Konfiguration vorgegeben.
+**Client-11 läuft mit Cisco IOSv 15.9(3)M4 (`vios-adventerprisek9-m`).** Für die CE-Konfiguration gilt klassische Cisco-IOS-Syntax (`configure terminal`, `ip vrf` bzw. je nach Parser `vrf definition`, `ip vrf forwarding` bzw. `vrf forwarding`, und `write memory`). Die genaue VRF-Lite-Befehlssyntax und Unterstützung bitte auf dem IOSv-Gerät mit `vrf ?` / `ip vrf ?` prüfen, bevor die CE-Konfiguration übernommen wird. `Client-101` wird als IOSv angenommen und sollte mit `show version` gegengeprüft werden.
 
 ## 7. Verifikation
 
