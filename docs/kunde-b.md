@@ -3,7 +3,7 @@
 **Zweite, unabhängige VRF** auf denselben Provider-Edges **XRv-5 und XRv-10**. Die CE-Links auf Port 5 werden separat verwendet; `KUNDE_A` bleibt auf Port 4.
 
 !!! warning "Ist-Zustand und Trennung"
-    Client-51 `Gi0/1` ist **shutdown** und hat keine IP; Client-101 `Gi0/1` ist ebenfalls **shutdown**. XRv-10 `Gi0/0/0/5` ist shutdown; **XRv-5 Gi0/0/0/5 ist noch nicht per Screenshot geprüft**. Die Adressen für KUNDE_B sind Vorschläge. Da Client-51 und Client-101 je zwei VPNs bedienen, sind auf ihnen CE-VRF-Lite-Kontexte erforderlich.
+    Client-51 `Gi0/1` ist **shutdown** und hat keine IP; Client-101 `Gi0/1` ist ebenfalls **shutdown**. XRv-10 `Gi0/0/0/5` ist shutdown; **XRv-5 Gi0/0/0/5 ist laut Screenshot shutdown und ohne IPv4-Adresse**. Die Adressen für KUNDE_B sind Vorschläge. Da Client-51 und Client-101 je zwei VPNs bedienen, sind auf ihnen CE-VRF-Lite-Kontexte erforderlich.
 
 ## 1. IP-Plan (neu vorgeschlagen)
 
@@ -165,7 +165,7 @@ interface Loopback152
  ip vrf forwarding KUNDE_B
  ip address 192.168.52.1 255.255.255.255
 exit
-ip route vrf KUNDE_A 101.1.0.0 255.255.0.0 <XRv5_Gi4_PE_IP>
+ip route vrf KUNDE_A 101.1.0.0 255.255.0.0 10.5.51.5
 ip route vrf KUNDE_B 192.168.102.1 255.255.255.255 172.16.52.1
 end
 ```
@@ -203,7 +203,7 @@ ip route vrf KUNDE_B 192.168.52.1 255.255.255.255 172.16.102.1
 end
 ```
 
-**Wichtig:** `ip vrf` / `ip vrf forwarding` ist klassische IOS-Syntax, nicht IOS XR. Die RDs auf den CEs dienen der VRF-Lite-Definition, nicht dem MP-BGP-VPNv4-Austausch. `<XRv5_Gi4_PE_IP>` erst nach Auslesen des Routers einsetzen.
+**Wichtig:** `ip vrf` / `ip vrf forwarding` ist klassische IOS-Syntax, nicht IOS XR. Die RDs auf den CEs dienen der VRF-Lite-Definition, nicht dem MP-BGP-VPNv4-Austausch. Die PE-IP `10.5.51.5` wurde aus der laufenden XRv-5-Konfiguration bestätigt.
 
 ## 7. Prüfung
 
