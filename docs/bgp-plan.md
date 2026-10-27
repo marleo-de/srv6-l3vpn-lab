@@ -6,12 +6,16 @@
 
 **Historische Referenz:** Die hochgeladenen Dateien enthalten ältere Konfigurationen aus dem Jahr 2019 (IOS XR 6.5.3 und IOS 15.7) mit MPLS/EVPN und Provider-AS **8412**. Sie werden **nicht** eingespielt und überschreiben **nicht** das bestehende SRv6-Underlay. Angaben aus den aktuellen Screenshots haben Vorrang.
 
+## Architekturentscheidung: XRv-6 ist Route Reflector
+
+**Keine direkten VPNv4-iBGP-Sessions zwischen XRv-5 und XRv-10 oder XRv-4 und XRv-7.** Alle vier PEs peeren mit XRv-6. [Konfiguration und Tests](route-reflector.md).
+
 ## BGP-Adressfamilien und AS-Plan
 
 | Strecke | Protokoll / AF | AS links | AS rechts | Hinweise |
 |---|---|---|---|---|
-| XRv-5 ↔ XRv-10 | iBGP VPNv4 über IPv6 Loopback0 | **65000** (neu) | **65000** (neu) | Dienste KUNDE_A und KUNDE_B |
-| XRv-4 ↔ XRv-7 | iBGP VPNv4 über IPv6 Loopback0 | **65000** (neu) | **65000** (neu) | Dienst KUNDE_C |
+| XRv-5 ↔ XRv-6 ↔ XRv-10 | iBGP VPNv4 via RR über IPv6 Loopback0 | **65000** (neu) | **65000** (neu) | Dienste KUNDE_A und KUNDE_B |
+| XRv-4 ↔ XRv-6 ↔ XRv-7 | iBGP VPNv4 via RR über IPv6 Loopback0 | **65000** (neu) | **65000** (neu) | Dienst KUNDE_C |
 | Client-51 ↔ XRv-5, KUNDE_A | eBGP IPv4 | **51** (historisch) | **65000** (neu) | Link `10.5.51.51 ↔ 10.5.51.5` |
 | Client-101 ↔ XRv-10, KUNDE_A | eBGP IPv4 | **noch festzulegen**, z. B. 101 | **65000** (neu) | Link `10.10.101.101 ↔ 10.10.101.10` |
 | Client-41 ↔ XRv-4, KUNDE_C | eBGP IPv4 | **41** (historisch) | **65000** (neu) | IPv4-PE `10.4.41.4` aus altem CE-Neighbor-Eintrag, **aktuell prüfen** |
