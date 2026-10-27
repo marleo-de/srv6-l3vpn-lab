@@ -16,7 +16,7 @@ show bgp vpnv4 unicast
 show running-config router bgp 65000
 ```
 
-Erwartung: VPNv4-Peer XRv-5 ↔ XRv-10 für KUNDE_A/B, XRv-4 ↔ XRv-7 für KUNDE_C. RDs unterscheiden Standorte, RTs unterscheiden Kunden. Nur Routen mit zum VPN passenden RT importieren.
+Erwartung: **XRv-6 als VPNv4 Route Reflector** hat Nachbarschaften zu XRv-4, XRv-5, XRv-7 und XRv-10. Jeder PE peert mit XRv-6, nicht direkt mit dem anderen Standort. Details: [RR-Verifikation](route-reflector.md). RDs unterscheiden Standorte, RTs unterscheiden Kunden. Nur Routen mit zum VPN passenden RT importieren.
 
 ## 2. VRF-Routing auf XRv-5 und XRv-10
 
