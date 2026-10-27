@@ -49,7 +49,18 @@ Die roten Nummern sind **nicht** die letzten Ziffern der IPv4-Adressen. Vor der 
 | IS-IS | `LABisis` | `LABisis` |
 | Locator-Name | `LABlocator` | `LABlocator` |
 
-## Neue Kundennetz-Adressen (Vorschlag)
+## Ist-Konfiguration Client-11 (Screenshot vom 27.10.2026)
+
+| Interface | Konfiguration | Hinweis |
+|---|---|---|
+| Loopback104 | `11.1.0.1/16` | Beschreibung `advertise to PE`; als mögliches Testpräfix für KUNDE_A geeignet |
+| Loopback106 | `2001:0:11::1/48` | IPv6-Testpräfix; gehört nicht automatisch zum IPv4-L3VPN |
+| GigabitEthernet0/0 | `10.1.11.11/24` | Verbindung zu XRv-1 `Gi0/0/0/4`; derzeit im globalen Routing |
+| GigabitEthernet0/1 | Keine IPv4-Adresse | Verbindung zu XRv-1 `Gi0/0/0/5`; vorgesehen für KUNDE_B |
+
+**Wichtig:** Der tatsächliche IP-Wert auf XRv-1 Port 4 wurde noch nicht gezeigt. Für KUNDE_A sollen die vorhandenen Adressen möglichst bestehen bleiben. Die bisher vorgeschlagenen `172.16.11.0/30`-Adressen wären ein *Umbau*, nicht der Ist-Zustand. Ob Loopback104 bereits über ein Protokoll advertised wird, geht aus der gezeigten Konfiguration nicht hervor.
+
+## Neue Kundennetz-Adressen (ursprünglicher Vorschlag – noch nicht anwenden)
 
 | Einstellung | Wert |
 |---|---|
