@@ -23,5 +23,6 @@ nav:
   - Underlay prüfen: underlay.md
   - L3VPN konfigurieren: l3vpn.md
   - Zweite VRF KUNDE_B: kunde-b.md
+  - Dritte VRF KUNDE_C (Client-41/71): kunde-c.md
   - Verifikation & Fehlersuche: verifikation.md
   - Weitere Ausbaustufen: erweiterungen.md
