@@ -13,7 +13,7 @@ Die roten Portnummern auf Seite 3 des SRv6-Leitfadens kennzeichnen `GigabitEther
 | XRv-4 | `Gi0/0/0/4` | Client-41 | `Gi0/0` | KUNDE_C |
 | XRv-7 | `Gi0/0/0/4` | Client-71 | `Gi0/0` | KUNDE_C |
 
-XRv-1 ↔ Client-11 bleibt physisch bestehen, wird aber für A/B **nicht** verwendet. XRv-2 ↔ Client-21 und weitere Links bleiben für spätere Erweiterungen verfügbar. XRv-5 und XRv-10 sind sowohl **PEs als auch Teilnehmer am IS-IS-/SRv6-Underlay**.
+XRv-1 ↔ Client-11 bleibt physisch bestehen, wird aber für A/B **nicht** verwendet. XRv-2 ↔ Client-21 und weitere Links bleiben für spätere Erweiterungen verfügbar. XRv-5 und XRv-10 sind sowohl **PEs als auch Teilnehmer am IS-IS-/SRv6-Underlay**. **XRv-6 ist zentraler VPNv4 Route Reflector** für XRv-4/5/7/10 und bleibt selbst Underlay-Router. [BGP-Topologie](route-reflector.md).
 
 ## Bestätigte Ist-Konfiguration: Client-51
 
