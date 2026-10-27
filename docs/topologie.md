@@ -1,108 +1,68 @@
-# Topologie und IP-Plan
+# Topologie und Adressierung
 
-## Interface-Nummern aus dem Leitfaden
+## Physische PE-/CE-Anschlüsse
 
-Auf **Seite 3** der Ausgangs-PDF ist die rote Ziffer am XRv-Router die letzte Stelle von `GigabitEthernet0/0/0/X`. Die beiden horizontal gezeichneten CE-Anbindungen an XRv-1 und XRv-10 sind **getrennte physische Links**.
+Die roten Portnummern auf Seite 3 des SRv6-Leitfadens kennzeichnen `GigabitEthernet0/0/0/X` auf XRv. Die Client-Seite nutzt `GigabitEthernet0/0` und `0/1`.
 
-| PE | Interface | Gegenstelle |
+| PE | PE-Interface | CE | CE-Interface | VPN |
+|---|---|---|---|---|
+| **XRv-5** | `Gi0/0/0/4` | **Client-51** | `Gi0/0` | KUNDE_A |
+| **XRv-5** | `Gi0/0/0/5` | **Client-51** | `Gi0/1` | KUNDE_B |
+| XRv-10 | `Gi0/0/0/4` | Client-101 | `Gi0/0` | KUNDE_A |
+| XRv-10 | `Gi0/0/0/5` | Client-101 | `Gi0/1` | KUNDE_B |
+| XRv-4 | `Gi0/0/0/4` | Client-41 | `Gi0/0` | KUNDE_C |
+| XRv-7 | `Gi0/0/0/4` | Client-71 | `Gi0/0` | KUNDE_C |
+
+XRv-1 ↔ Client-11 bleibt physisch bestehen, wird aber für A/B **nicht** verwendet. XRv-2 ↔ Client-21 und weitere Links bleiben für spätere Erweiterungen verfügbar. XRv-5 und XRv-10 sind sowohl **PEs als auch Teilnehmer am IS-IS-/SRv6-Underlay**.
+
+## Bestätigte Ist-Konfiguration: Client-51
+
+Der aktuelle Screenshot zeigt:
+
+| Interface | Tatsächlicher Wert | Status aus Config |
 |---|---|---|
-| XRv-1 | `Gi0/0/0/4` | Client-11 `G0/0` |
-| XRv-1 | `Gi0/0/0/5` | Client-11 `G0/1` |
-| XRv-10 | `Gi0/0/0/4` | Client-101 `G0/0` |
-| XRv-10 | `Gi0/0/0/5` | Client-101 `G0/1` |
+| `Loopback104` | `51.1.0.1/16` | `description advertise to PE` |
+| `Loopback106` | `2001:0:51::1/48` | IPv6-Testadresse |
+| `Gi0/0` | **`10.5.51.51/24`** | `description XRv-5 Gi4`, kein Shutdown |
+| `Gi0/1` | keine IPv4-Adresse | `description XRv-5 Gi5`, **shutdown** |
 
-Weitere direkt verbundene Clients aus derselben Grafik:
+**Noch offen:** `XRv-5 Gi0/0/0/4` – die PE-IP ist noch nicht per Routerausgabe belegt. Nicht aus dem Namensschema raten. `XRv-5 Gi0/0/0/5` ebenfalls vor Änderung prüfen.
 
-| XRv-Router | Rolle | CE-Interfaces |
+## Bestätigte Ist-Konfiguration: XRv-10 und Client-101
+
+| Gerät / Interface | IPv4 | Weitere Information |
 |---|---|---|
-| XRv-2 | späterer PE | `Gi0/0/0/4`, `Gi0/0/0/5` ↔ Client-21 |
-| XRv-4 | späterer PE | `Gi0/0/0/4`, `Gi0/0/0/5` ↔ Client-41 |
-| XRv-5 | späterer PE | `Gi0/0/0/4`, `Gi0/0/0/5` ↔ Client-51 |
-| XRv-7 | späterer PE | `Gi0/0/0/4`, `Gi0/0/0/5` ↔ Client-71 |
+| XRv-10 `Gi0/0/0/4` | `10.10.101.10/24` | Link Client-101 `Gi0/0` |
+| Client-101 `Gi0/0` | `10.10.101.101/24` | Kein Shutdown im gezeigten Block |
+| Client-101 `Loopback104` | `101.1.0.1/16` | IPv4-Testpräfix |
+| Client-101 `Loopback106` | `2001:0:101::1/48` | IPv6-Testpräfix |
+| XRv-10 `Gi0/0/0/5` | keine | `shutdown` |
+| Client-101 `Gi0/1` | keine | `shutdown` |
 
-Die roten Nummern sind **nicht** die letzten Ziffern der IPv4-Adressen. Vor der Konfiguration auf allen Ports `show interfaces brief` und `show running-config interface` prüfen.
+## VRF-/BGP-Plan (neu)
 
-## Softwarestand
+| VRF | PE-Paar | RD links / rechts | Route Target | Testnetze |
+|---|---|---|---|---|
+| KUNDE_A | XRv-5 ↔ XRv-10 | `65000:51` / `65000:101` | `65000:100` | **`51.1.0.0/16`**, **`101.1.0.0/16`** |
+| KUNDE_B | XRv-5 ↔ XRv-10 | `65000:52` / `65000:102` | `65000:200` | neue Test-Loopbacks nötig |
+| KUNDE_C | XRv-4 ↔ XRv-7 | `65000:41` / `65000:71` | `65000:300` | noch nicht anhand der Geräte belegt |
 
-- **XRv-3:** `show version` bestätigt Cisco IOS XRv 9000, IOS XR **25.1.1**.
-- **Client-11:** `show version` bestätigt Cisco IOSv **15.9(3)M4** (`vios-adventerprisek9-m`) mit zwei GigabitEthernet-Interfaces.
-- Die übrigen Router anhand ihres eigenen `show version` prüfen.
+### Vorschlag für KUNDE_B (noch **nicht** vorhanden)
 
-## Rollen für den Basistest
-
-| Knoten | Rolle | Bemerkung |
-|---|---|---|
-| XRv-1 | **PE** | Client-11 |
-| XRv-10 | **PE** | Client-101 |
-| XRv-2 bis XRv-9 | P (anfangs) | Bestehendes IS-IS-/SRv6-Underlay |
-| XRv-2, XRv-4, XRv-5, XRv-7 | weitere PE-Kandidaten | Bereits mit Clients verbunden |
-
-**Hinweis:** P und PE sind Service-Rollen; ein PE bleibt Teil des IS-IS-/SRv6-Underlays. Keine Umverkabelung notwendig.
-
-## Adressen aus dem bestehenden SRv6-Leitfaden
-
-| Merkmal | XRv-1 | XRv-10 |
-|---|---|---|
-| IPv6 Loopback0 | `2001:db8:1:1::1/128` | `2001:db8:1:1::10/128` |
-| IPv4 Loopback0 | `1.1.1.1/32` | `1.1.1.10/32` |
-| uSID Locator | `5f00:0:1::/48` | `5f00:0:10::/48` |
-| IS-IS | `LABisis` | `LABisis` |
-| Locator-Name | `LABlocator` | `LABlocator` |
-
-## Ist-Konfiguration Client-11 (Screenshot vom 27.10.2026)
-
-| Interface | Konfiguration | Hinweis |
-|---|---|---|
-| Loopback104 | `11.1.0.1/16` | Beschreibung `advertise to PE`; als mögliches Testpräfix für KUNDE_A geeignet |
-| Loopback106 | `2001:0:11::1/48` | IPv6-Testpräfix; gehört nicht automatisch zum IPv4-L3VPN |
-| GigabitEthernet0/0 | `10.1.11.11/24` | Verbindung zu XRv-1 `Gi0/0/0/4`; derzeit im globalen Routing |
-| GigabitEthernet0/1 | Keine IPv4-Adresse | Verbindung zu XRv-1 `Gi0/0/0/5`; vorgesehen für KUNDE_B |
-
-**Nachträglich bestätigt:** XRv-1 Port 4 hat `10.1.11.1/24`. Für KUNDE_A sollen die vorhandenen Adressen möglichst bestehen bleiben. Die bisher vorgeschlagenen `172.16.11.0/30`-Adressen wären ein *Umbau*, nicht der Ist-Zustand. Ob Loopback104 bereits über ein Protokoll advertised wird, geht aus der gezeigten Konfiguration nicht hervor.
-
-## Bestätigte PE-Seite: XRv-1
-
-Screenshot der laufenden Konfiguration:
-
-| Interface | IPv4 | Konfigurationsstatus |
-|---|---|---|
-| `Gi0/0/0/4` | `10.1.11.1/24` | `description Client-11 Gi0/0`, CDP, IPv6 enable, kein shutdown |
-| `Gi0/0/0/5` | keine | `shutdown` |
-
-Die Verbindung `XRv-1 Gi0/0/0/4 ↔ Client-11 Gi0/0` besitzt damit das vorhandene Netz **10.1.11.0/24** (PE `.1`, CE `.11`). Beim späteren Umhängen nach VRF `KUNDE_A` die IP-Adresse in der VRF wieder einrichten und bestehende global geroutete Abhängigkeiten beachten. Interface `Gi0/0/0/5` muss für `KUNDE_B` explizit aktiviert werden.
-
-## Bestätigte PE-/CE-Seite: XRv-10 und Client-101
-
-| Gerät | Interface | IPv4 | Konfigurationsstatus |
+| Link | PE-IP | CE-IP | CE-Test-Loopback |
 |---|---|---|---|
-| XRv-10 | `Gi0/0/0/4` | `10.10.101.10/24` | Beschreibung `Client-101 Gi0/0`; kein Shutdown im gezeigten Block |
-| Client-101 | `Gi0/0` | `10.10.101.101/24` | Beschreibung `XRv-10 Gi4` |
-| XRv-10 | `Gi0/0/0/5` | keine | `shutdown` |
-| Client-101 | `Gi0/1` | keine | `shutdown` |
-| Client-101 | `Loopback104` | `101.1.0.1/16` | Beschreibung `advertise to PE`; IPv4-Testnetz `101.1.0.0/16` |
-| Client-101 | `Loopback106` | `2001:0:101::1/48` | IPv6-Testnetz |
+| XRv-5 ↔ Client-51, Port 5 | `172.16.52.1/30` | `172.16.52.2/30` | `192.168.52.1/32` |
+| XRv-10 ↔ Client-101, Port 5 | `172.16.102.1/30` | `172.16.102.2/30` | `192.168.102.1/32` |
 
-**Bestätigte KUNDE_A-Verbindungen (Ist-Zustand):**
+Für A/B benötigen die gemeinsam verwendeten CEs **getrennte Routingtabellen (VRF-Lite)**. Bei einer VRF-Zuweisung auf IOSv zuvor IP-Adressen sichern: die IP-Adresse kann dabei entfernt werden.
 
-- XRv-1 ↔ Client-11: `10.1.11.1/24` ↔ `10.1.11.11/24`, Testnetz `11.1.0.0/16`.
-- XRv-10 ↔ Client-101: `10.10.101.10/24` ↔ `10.10.101.101/24`, Testnetz `101.1.0.0/16`.
+## Underlay-Loopbacks und Locator-Schema
 
-Die beiden `Gi0/0/0/5`-Ports sind für KUNDE_B vorgesehen, aktuell aber **shutdown**. Auf Client-101 ist auch `Gi0/1` shutdown.
+| PE | IPv6-Loopback gemäß Leitfaden | uSID-Locator gemäß Leitfaden |
+|---|---|---|
+| XRv-5 | `2001:db8:1:1::5/128` | `5f00:0:5::/48` |
+| XRv-10 | `2001:db8:1:1::10/128` | `5f00:0:10::/48` |
+| XRv-4 | `2001:db8:1:1::4/128` | `5f00:0:4::/48` |
+| XRv-7 | `2001:db8:1:1::7/128` | `5f00:0:7::/48` |
 
-## Bestätigter Adressplan KUNDE_A
-
-| Standort | PE-IP | CE-IP | IPv4-Testnetz |
-|---|---|---|---|
-| XRv-1 / Client-11 | `10.1.11.1/24` | `10.1.11.11/24` | `11.1.0.0/16` |
-| XRv-10 / Client-101 | `10.10.101.10/24` | `10.10.101.101/24` | `101.1.0.0/16` |
-
-Die früheren Adressvorschläge `172.16.11.0/30`, `172.16.101.0/30`, `192.168.11.0/24` und `192.168.101.0/24` sind **verworfen**.
-
-## Weitere VPNs
-
-- [KUNDE_B](kunde-b.md): XRv-1 / XRv-10, Port 5, eigenständiger VPN-Dienst.
-- [KUNDE_C](kunde-c.md): XRv-4 / XRv-7, Client-41 / Client-71, eigener RT `65000:300`. Die CE-IP-Adressen fehlen noch.
-
-## Später
-
-**KUNDE_B:** Port 5, RT `65000:200`, RD `65000:12`/`65000:102`, PE-CE `172.16.12.0/30` bzw. `172.16.102.0/30`, CE-Test-LAN `192.168.12.0/24` und `192.168.102.0/24`. Siehe [Konfiguration](kunde-b.md). CE-Router benötigen dafür VRF-Lite oder getrennte Routingkontexte.
+Die Werte stammen aus dem Nummerierungsschema des ursprünglichen Leitfadens und sind **auf den betreffenden PEs zu prüfen**.
