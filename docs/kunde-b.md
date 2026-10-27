@@ -60,7 +60,7 @@ interface GigabitEthernet0/0/0/5
 commit
 ```
 
-## 4. Statische PE-Routen
+## 4. Optionale statische Test-Routen (später durch PE–CE eBGP ersetzen)
 
 **XRv-5:**
 
@@ -91,6 +91,8 @@ commit
 ```
 
 ## 5. BGP: zweite VRF im bestehenden AS 65000
+
+Ziel ist PE–CE eBGP für beide VRFs; die historische Konfiguration ist nur Referenz. Siehe [BGP-Design](bgp-plan.md).
 
 Die VPNv4-BGP-Nachbarschaft XRv-5 ↔ XRv-10 existiert bei erfolgreichem KUNDE_A-Test bereits. **Keine zweite Session** anlegen.
 
