@@ -29,11 +29,8 @@ show vrf KUNDE_A
 show running-config vrf KUNDE_A
 ```
 
-!!! danger "Ist-Konfiguration beachten"
-    Client-11 hat laut aktueller Konfiguration bereits `Gi0/0 = 10.1.11.11/24` und `Loopback104 = 11.1.0.1/16`. Die folgenden Adressen `172.16.11.1/30` / `172.16.11.2/30` und das Netz `192.168.11.0/24` sind **nur alte Planungsvorschläge**. Nicht auf XRv-1/Client-11 übernehmen, bevor dessen bestehende PE-Port-Adresse geprüft und ein endgültiger Adressplan festgelegt wurde. Es ist sinnvoller, das vorhandene CE-Testpräfix beizubehalten.
-
-!!! warning "Endgültiger Ist-Adressplan für KUNDE_A"
-    Beide PE–CE-Links und Testnetze sind nun aus Gerätekonfigurationen bekannt: XRv-1 `10.1.11.1/24` ↔ Client-11 `10.1.11.11/24`, Testnetz `11.1.0.0/16`; XRv-10 `10.10.101.10/24` ↔ Client-101 `10.10.101.101/24`, Testnetz `101.1.0.0/16`. Die folgenden ursprünglichen `172.16.x`-Beispiele sind **nicht** der Ist-Zustand und dürfen nicht ohne Anpassung angewendet werden.
+!!! warning "Vorhandene CE-IP-Adressen beibehalten"
+    Beide Links wurden durch Screenshots bestätigt: XRv-1/Client-11 `10.1.11.1/24` ↔ `10.1.11.11/24`, XRv-10/Client-101 `10.10.101.10/24` ↔ `10.10.101.101/24`. Die VRF-Zuordnung eines Interfaces kann bestehende IPv4-Adressen entfernen. Vor dem Commit den Ist-Zustand und die Auswirkung auf bestehendes Routing prüfen.
 
 ## 2. Kundenseitige Interfaces
 
@@ -43,7 +40,7 @@ show running-config vrf KUNDE_A
 configure
 interface GigabitEthernet0/0/0/4
  vrf KUNDE_A
- ipv4 address 172.16.11.1 255.255.255.252
+ ipv4 address 10.1.11.1 255.255.255.0
  no shutdown
 !
 commit
@@ -55,7 +52,7 @@ commit
 configure
 interface GigabitEthernet0/0/0/4
  vrf KUNDE_A
- ipv4 address 172.16.101.1 255.255.255.252
+ ipv4 address 10.10.101.10 255.255.255.0
  no shutdown
 !
 commit
@@ -65,7 +62,7 @@ Bei einer bereits vorhandenen Interface-Konfiguration erst Kollisionen mit IP-Ad
 
 ## 3. CE-Adressen und statische Routen
 
-Vorschlag für Client-11: `172.16.11.2/30` mit LAN `192.168.11.0/24`; Client-101: `172.16.101.2/30` mit LAN `192.168.101.0/24`. CE-Konfiguration ist abhängig vom Gerätetyp und wird **nicht** als angeblich vorhandene Konfiguration dargestellt.
+Bestätigte CE-Adressen: Client-11 `10.1.11.11/24`, Loopback104 `11.1.0.1/16`; Client-101 `10.10.101.101/24`, Loopback104 `101.1.0.1/16`. Die folgenden statischen PE-Routen zeigen auf die vorhandenen CE-Adressen. Sie ersetzen keine eventuell schon eingerichtete dynamische Route; vor dem Commit die Routingtabelle und die vorhandene statische Konfiguration prüfen.
 
 **XRv-1**:
 
@@ -74,7 +71,7 @@ configure
 router static
  vrf KUNDE_A
   address-family ipv4 unicast
-   192.168.11.0/24 172.16.11.2
+   11.1.0.0/16 10.1.11.11
   !
  !
 !
@@ -88,7 +85,7 @@ configure
 router static
  vrf KUNDE_A
   address-family ipv4 unicast
-   192.168.101.0/24 172.16.101.2
+   101.1.0.0/16 10.10.101.101
   !
  !
 !
