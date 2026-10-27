@@ -1,34 +1,23 @@
-# Phase 4 – Zweite VRF KUNDE_B
+# VRF KUNDE_B – Client-51 ↔ Client-101
 
-Nach erfolgreichem [Basistest KUNDE_A](l3vpn.md) fügen wir auf **XRv-1** und **XRv-10** eine zweite, unabhängig geroutete VPN-Instanz hinzu.
+**Zweite, unabhängige VRF** auf denselben Provider-Edges **XRv-5 und XRv-10**. Die CE-Links auf Port 5 werden separat verwendet; `KUNDE_A` bleibt auf Port 4.
 
-!!! warning "Vorab: Client-11 und Client-101 sind jeweils gemeinsam angeschlossene CE-Router"
-    An jedem CE enden nun zwei Leitungen (Port 4 für KUNDE_A, Port 5 für KUNDE_B). **Beide Kunden dürfen auf dem CE nicht in derselben globalen Routingtabelle landen.** Für echte Isolation müssen die Client-Router VRF-Lite oder getrennte logische Router-Kontexte unterstützen. Falls das nicht möglich ist, für KUNDE_B jeweils einen separaten CE-Router einsetzen. Nur eine zweite VRF auf dem PE reicht für die vollständige Ende-zu-Ende-Isolation nicht.
+!!! warning "Ist-Zustand und Trennung"
+    Client-51 `Gi0/1` ist **shutdown** und hat keine IP; Client-101 `Gi0/1` ist ebenfalls **shutdown**. XRv-10 `Gi0/0/0/5` ist shutdown; **XRv-5 Gi0/0/0/5 ist noch nicht per Screenshot geprüft**. Die Adressen für KUNDE_B sind Vorschläge. Da Client-51 und Client-101 je zwei VPNs bedienen, sind auf ihnen CE-VRF-Lite-Kontexte erforderlich.
 
-!!! note "Bestätigte CE-Ausgangslage"
-    Auf **Client-11** zeigt die vorliegende Konfiguration `Gi0/0 = 10.1.11.11/24`, `Gi0/1` noch **ohne IPv4-Adresse**, `Loopback104 = 11.1.0.1/16` und `Loopback106 = 2001:0:11::1/48`. Für KUNDE_B kann der zweite physische CE-Port genutzt werden. **Die bestehende KUNDE_A-Adressierung bitte nicht durch die ursprünglichen Beispiele ersetzen.** Eine VRF-Zuordnung auf dem IOSv-CE kann vorhandene IPv4-Adressen entfernen und muss deshalb geplant erfolgen.
+## 1. IP-Plan (neu vorgeschlagen)
 
-!!! note "Auch die zweite CE-Seite ist bestätigt"
-    XRv-10 `Gi0/0/0/4 = 10.10.101.10/24`, Client-101 `Gi0/0 = 10.10.101.101/24`, Loopback104 `101.1.0.1/16` und Loopback106 `2001:0:101::1/48`. Sowohl XRv-10 `Gi0/0/0/5` als auch Client-101 `Gi0/1` stehen auf `shutdown`. Port 5 und CE `Gi0/1` müssen für KUNDE_B bewusst aktiviert werden; die KUNDE_A-Adressen bleiben erhalten.
-
-## 1. Neuer Adressplan
-
-Die CE-Portnummern ergeben sich aus **Seite 3** der vorhandenen Lab-PDF. Die IPv4-Adressen sind neue Beispiele; vor der Nutzung auf Konflikte prüfen.
-
-| Einstellung | XRv-1 / Client-11 | XRv-10 / Client-101 |
+| Einstellung | XRv-5 / Client-51 | XRv-10 / Client-101 |
 |---|---|---|
-| VRF | `KUNDE_B` | `KUNDE_B` |
-| PE-Interface | `Gi0/0/0/5` | `Gi0/0/0/5` |
-| CE-Interface | `G0/1` | `G0/1` |
-| PE-IP | `172.16.12.1/30` | `172.16.102.1/30` |
-| CE-IP | `172.16.12.2/30` | `172.16.102.2/30` |
-| CE-Test-LAN | `192.168.12.0/24` | `192.168.102.0/24` |
-| RD | `65000:12` | `65000:102` |
-| Import-/Export-RT | `65000:200` | `65000:200` |
+| PE-Port | `Gi0/0/0/5` | `Gi0/0/0/5` |
+| CE-Port | `Gi0/1` | `Gi0/1` |
+| PE-IP | `172.16.52.1/30` | `172.16.102.1/30` |
+| CE-IP | `172.16.52.2/30` | `172.16.102.2/30` |
+| CE-Testloopback | `192.168.52.1/32` | `192.168.102.1/32` |
+| VRF / RT | `KUNDE_B` / `65000:200` | `KUNDE_B` / `65000:200` |
+| RD | `65000:52` | `65000:102` |
 
-Der BGP-AS bleibt **65000**; die vorhandene iBGP-VPNv4-Nachbarschaft zwischen beiden PEs wird **mitbenutzt**. Es wird keine zweite BGP-Session gebraucht.
-
-## 2. VRF KUNDE_B – auf beiden PEs
+## 2. VRF-Definition (auf beiden PEs)
 
 ```cisco
 configure
@@ -45,23 +34,21 @@ vrf KUNDE_B
 commit
 ```
 
-Das Route Target `65000:200` darf nicht mit dem von `KUNDE_A` (`65000:100`) verwechselt werden.
+## 3. PE-Interface (nach Überprüfung der Ist-Konfiguration)
 
-## 3. Kundenseitige Interfaces
-
-**XRv-1**:
+**XRv-5:**
 
 ```cisco
 configure
 interface GigabitEthernet0/0/0/5
  vrf KUNDE_B
- ipv4 address 172.16.12.1 255.255.255.252
+ ipv4 address 172.16.52.1 255.255.255.252
  no shutdown
 !
 commit
 ```
 
-**XRv-10**:
+**XRv-10:**
 
 ```cisco
 configure
@@ -73,50 +60,47 @@ interface GigabitEthernet0/0/0/5
 commit
 ```
 
-!!! note "Bestehende Interface-Konfiguration"
-    Falls die Ports bereits Adressen besitzen, vor der VRF-Änderung `show running-config interface GigabitEthernet0/0/0/5` prüfen. IOS XR kann das Entfernen einer bestehenden IPv4-Adresse vor dem VRF-Wechsel erfordern.
+## 4. Statische PE-Routen
 
-## 4. Statische Routen zu den Kundennetzen
-
-**XRv-1**:
+**XRv-5:**
 
 ```cisco
 configure
 router static
  vrf KUNDE_B
   address-family ipv4 unicast
-   192.168.12.0/24 172.16.12.2
+   192.168.52.1/32 172.16.52.2
   !
  !
 !
 commit
 ```
 
-**XRv-10**:
+**XRv-10:**
 
 ```cisco
 configure
 router static
  vrf KUNDE_B
   address-family ipv4 unicast
-   192.168.102.0/24 172.16.102.2
+   192.168.102.1/32 172.16.102.2
   !
  !
 !
 commit
 ```
 
-Die CE-Testnetze müssen am jeweiligen Client tatsächlich existieren (z. B. als Loopback mit einer Testadresse und entsprechend angepasstem /32-Präfix) – ansonsten wird der Ping ins entfernte LAN trotz funktionierendem SRv6 nicht beantwortet.
+## 5. BGP: zweite VRF im bestehenden AS 65000
 
-## 5. KUNDE_B in vorhandenes BGP aufnehmen
+Die VPNv4-BGP-Nachbarschaft XRv-5 ↔ XRv-10 existiert bei erfolgreichem KUNDE_A-Test bereits. **Keine zweite Session** anlegen.
 
-**Auf XRv-1** im vorhandenen `router bgp 65000` ergänzen:
+**XRv-5:**
 
 ```cisco
 configure
 router bgp 65000
  vrf KUNDE_B
-  rd 65000:12
+  rd 65000:52
   address-family ipv4 unicast
    redistribute static
    segment-routing srv6
@@ -129,7 +113,7 @@ router bgp 65000
 commit
 ```
 
-**Auf XRv-10**:
+**XRv-10:**
 
 ```cisco
 configure
@@ -148,25 +132,82 @@ router bgp 65000
 commit
 ```
 
-Damit soll jede VRF eine eigene SRv6-Service-SID mit uDT4-Verhalten erhalten. **Die tatsächliche SID-Installation und Datenebenenfunktion auf XRv 9000 mit IOS XR 25.1.1 sind im Lab nachzuweisen**, nicht vorauszusetzen.
+## 6. CE-Routingtabellen trennen (IOSv 15.x, Syntax im Lab prüfen)
 
-## 6. CE-Seite – zwingend getrennte Routingtabellen
+!!! danger "Bestehende IPv4-Adressen und Loopbacks"
+    Auf IOSv entfernt `ip vrf forwarding` üblicherweise eine vorhandene Interface-IP-Adresse; sie muss danach innerhalb der VRF neu konfiguriert werden. Bestehende Loopback104 für KUNDE_A umhängen, nicht eine zweite Loopback104 anlegen. Vor `write memory` die Erreichbarkeit kontrollieren.
 
-Auf **Client-11**:
+**Client-51 – CE VRF-Lite (beide Kunden):**
 
-- `G0/0` in CE-VRF `KUNDE_A`, IPv4 `10.1.11.11/24`, Remote-Route über `10.1.11.1`
-- `G0/1` in CE-VRF `KUNDE_B`, IPv4 `172.16.12.2/30`, Default/Route über `172.16.12.1`
+```cisco
+configure terminal
+ip vrf KUNDE_A
+ rd 65000:51
+exit
+ip vrf KUNDE_B
+ rd 65000:52
+exit
+interface GigabitEthernet0/0
+ ip vrf forwarding KUNDE_A
+ ip address 10.5.51.51 255.255.255.0
+ no shutdown
+exit
+interface Loopback104
+ ip vrf forwarding KUNDE_A
+ ip address 51.1.0.1 255.255.0.0
+exit
+interface GigabitEthernet0/1
+ ip vrf forwarding KUNDE_B
+ ip address 172.16.52.2 255.255.255.252
+ no shutdown
+exit
+interface Loopback152
+ ip vrf forwarding KUNDE_B
+ ip address 192.168.52.1 255.255.255.255
+exit
+ip route vrf KUNDE_A 101.1.0.0 255.255.0.0 <XRv5_Gi4_PE_IP>
+ip route vrf KUNDE_B 192.168.102.1 255.255.255.255 172.16.52.1
+end
+```
 
-Auf **Client-101**:
+**Client-101 – CE VRF-Lite (beide Kunden):**
 
-- `G0/0` in CE-VRF `KUNDE_A`, IPv4 `10.10.101.101/24`, Remote-Route über `10.10.101.10`
-- `G0/1` in CE-VRF `KUNDE_B`, IPv4 `172.16.102.2/30`, Default/Route über `172.16.102.1`
+```cisco
+configure terminal
+ip vrf KUNDE_A
+ rd 65000:101
+exit
+ip vrf KUNDE_B
+ rd 65000:102
+exit
+interface GigabitEthernet0/0
+ ip vrf forwarding KUNDE_A
+ ip address 10.10.101.101 255.255.255.0
+ no shutdown
+exit
+interface Loopback104
+ ip vrf forwarding KUNDE_A
+ ip address 101.1.0.1 255.255.0.0
+exit
+interface GigabitEthernet0/1
+ ip vrf forwarding KUNDE_B
+ ip address 172.16.102.2 255.255.255.252
+ no shutdown
+exit
+interface Loopback152
+ ip vrf forwarding KUNDE_B
+ ip address 192.168.102.1 255.255.255.255
+exit
+ip route vrf KUNDE_A 51.1.0.0 255.255.0.0 10.10.101.10
+ip route vrf KUNDE_B 192.168.52.1 255.255.255.255 172.16.102.1
+end
+```
 
-**Client-11 läuft mit Cisco IOSv 15.9(3)M4 (`vios-adventerprisek9-m`).** Für die CE-Konfiguration gilt klassische Cisco-IOS-Syntax (`configure terminal`, `ip vrf` bzw. je nach Parser `vrf definition`, `ip vrf forwarding` bzw. `vrf forwarding`, und `write memory`). Die genaue VRF-Lite-Befehlssyntax und Unterstützung bitte auf dem IOSv-Gerät mit `vrf ?` / `ip vrf ?` prüfen, bevor die CE-Konfiguration übernommen wird. `Client-101` wird als IOSv angenommen und sollte mit `show version` gegengeprüft werden.
+**Wichtig:** `ip vrf` / `ip vrf forwarding` ist klassische IOS-Syntax, nicht IOS XR. Die RDs auf den CEs dienen der VRF-Lite-Definition, nicht dem MP-BGP-VPNv4-Austausch. `<XRv5_Gi4_PE_IP>` erst nach Auslesen des Routers einsetzen.
 
-## 7. Verifikation
+## 7. Prüfung
 
-Auf **beiden PEs**:
+Auf beiden PEs:
 
 ```cisco
 show vrf KUNDE_A
@@ -174,20 +215,17 @@ show vrf KUNDE_B
 show route vrf KUNDE_A
 show route vrf KUNDE_B
 show bgp vpnv4 unicast summary
-show bgp vpnv4 unicast
 show segment-routing srv6 sid
 ```
 
-| Test | Erwartetes Ergebnis |
-|---|---|
-| KUNDE_B von Client-11 nach Client-101 | `192.168.102.0/24` erreichbar, Gegenrichtung ebenfalls |
-| KUNDE_A weiterhin erreichbar | Vorhandene Konnektivität bleibt intakt |
-| KUNDE_A → KUNDE_B | **Keine Erreichbarkeit**, solange keine explizite Routenfreigabe/Leak-Konfiguration vorliegt |
-| BGP-Routen | A-Routen RT `65000:100`, B-Routen RT `65000:200` |
-| SRv6 | Pro VRF eigene Service-SID; bei fehlender uDT4-Datenebene Test nicht bestanden |
+Auf beiden IOSv-CEs:
 
-### Optional: überlappende Adressen
+```cisco
+show ip vrf
+show ip route vrf KUNDE_A
+show ip route vrf KUNDE_B
+ping vrf KUNDE_A 101.1.0.1 source Loopback104
+ping vrf KUNDE_B 192.168.102.1 source Loopback152
+```
 
-Wenn beide Mandanten unabhängig funktionieren, können sie absichtlich **dieselben IPv4-Präfixe** verwenden. Das erfordert getrennte Routingtabellen auf PE **und** CE. Dazu zuerst die Testpräfixe auf beiden Kundenseiten nachvollziehbar anpassen, damit identische Adressen nicht versehentlich innerhalb *derselben* VRF doppelt vergeben werden.
-
-Zurück zu [Verifikation und Fehlersuche](verifikation.md).
+Das Ping-Beispiel ist aus Sicht von **Client-51** formuliert; auf Client-101 Testziele umkehren. Die VPN-Routen von A, B und C dürfen nicht ohne explizite Route-Leaking-Konfiguration vermischt werden.
