@@ -94,7 +94,7 @@ commit
 
 Ziel ist PE–CE eBGP für beide VRFs; die historische Konfiguration ist nur Referenz. Siehe [BGP-Design](bgp-plan.md).
 
-Die VPNv4-BGP-Nachbarschaft XRv-5 ↔ XRv-10 existiert bei erfolgreichem KUNDE_A-Test bereits. **Keine zweite Session** anlegen.
+Die VPNv4-BGP-Nachbarschaften XRv-5 ↔ **XRv-6 (RR)** und XRv-10 ↔ **XRv-6 (RR)** bestehen aus KUNDE_A bereits. **Keine zweite Session für KUNDE_B** anlegen. [RR-Konfiguration](route-reflector.md).
 
 **XRv-5:**
 
