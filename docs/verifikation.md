@@ -1,8 +1,14 @@
-# Phase 3 – Verifikation und Fehlersuche
+# Verifikation und Fehlersuche
 
-## Test 1: BGP-Control-Plane
+## VPN-Zuordnung
 
-Auf beiden PEs:
+| VPN | Lokaler PE | Lokales Testpräfix | Gegen-PE | Entferntes Testpräfix |
+|---|---|---|---|---|
+| KUNDE_A | XRv-5 | `51.1.0.0/16` | XRv-10 | `101.1.0.0/16` |
+| KUNDE_B | XRv-5 | `192.168.52.1/32` (geplant) | XRv-10 | `192.168.102.1/32` (geplant) |
+| KUNDE_C | XRv-4 | `192.168.41.1/32` (geplant) | XRv-7 | `192.168.71.1/32` (geplant) |
+
+## 1. Control Plane
 
 ```cisco
 show bgp vpnv4 unicast summary
@@ -10,51 +16,49 @@ show bgp vpnv4 unicast
 show running-config router bgp 65000
 ```
 
-**Erwartung:** IPv6-BGP-Nachbarschaft Established. Beide lokalen LAN-Routen sind als VPNv4-Routen verfügbar, RD und Route Target konsistent. Falls `summary` je nach Image anders geparst wird: `show bgp ?` verwenden.
+Erwartung: VPNv4-Peer XRv-5 ↔ XRv-10 für KUNDE_A/B, XRv-4 ↔ XRv-7 für KUNDE_C. RDs unterscheiden Standorte, RTs unterscheiden Kunden. Nur Routen mit zum VPN passenden RT importieren.
 
-## Test 2: VRF-RIB
+## 2. VRF-Routing auf XRv-5 und XRv-10
 
 ```cisco
 show route vrf KUNDE_A
-show route vrf KUNDE_A 101.1.0.0/16
-show route vrf KUNDE_A 11.1.0.0/16
-```
-
-Auf XRv-1 sollte `11.1.0.0/16` lokal (statisch) und `101.1.0.0/16` remote (BGP) erscheinen; auf XRv-10 umgekehrt.
-
-## Test 3: SRv6-Service-SID
-
-```cisco
+show route vrf KUNDE_B
 show segment-routing srv6 locator detail
 show segment-routing srv6 sid
-show bgp vpnv4 unicast
 ```
 
-**Entscheidend:** Die Service-SID muss dem VPNv4-Präfix zugeordnet und im Forwarding tatsächlich nutzbar sein. uN-Locator allein ist **kein** Nachweis einer uDT4-Funktion.
+Für KUNDE_A ist auf XRv-5 `51.1.0.0/16` lokal statisch und `101.1.0.0/16` remote über BGP zu erwarten; auf XRv-10 umgekehrt. Für KUNDE_B die getrennten /32-Testnetze prüfen.
 
-## Test 4: Ende-zu-Ende
+## 3. CE-Tests (IOSv)
 
-- Von Client-11 das LAN auf Client-101 erreichen.
-- Von Client-101 die Gegenrichtung testen.
-- Wenn kein echtes LAN hinter CEs vorhanden ist, geeignete CE-Loopbacks als /32-Testnetze nutzen und die statischen Routen entsprechend anpassen.
-- Optional `ping vrf KUNDE_A` vom PE aus (plattformabhängige Befehlsargumente mit `?` prüfen).
+Von Client-51:
 
-## Getrennte Mandanten prüfen
+```cisco
+show ip vrf
+show ip route vrf KUNDE_A
+show ip route vrf KUNDE_B
+ping vrf KUNDE_A 101.1.0.1 source Loopback104
+ping vrf KUNDE_B 192.168.102.1 source Loopback152
+```
 
-Nach Einrichtung der [zweiten VRF KUNDE_B](kunde-b.md) sicherstellen, dass Routen mit RT `65000:200` **nicht** in `KUNDE_A` erscheinen. Kundentests zwischen A und B müssen ohne Route Leaking fehlschlagen. Auch die beiden CE-Anschlüsse müssen durch getrennte Routingtabellen isoliert sein.
+Von Client-101 jeweils die Gegenrichtung prüfen. Ping über die Loopbacks funktioniert erst, wenn die Rückrouten in den passenden CE-VRFs eingerichtet sind.
 
-Für die neue VRF siehe [KUNDE_C – Client-41 und Client-71](kunde-c.md).
+## 4. Isolation
+
+- In `KUNDE_A` dürfen keine Routen aus RT `65000:200` oder `65000:300` auftauchen.
+- In `KUNDE_B` keine Routen aus RT `65000:100` oder `65000:300`.
+- Auf gemeinsam genutzten Client-51/101 müssen `Gi0/0` und `Gi0/1` **separaten CE-VRFs** zugewiesen sein.
+- Auf XRv-4/7 entsprechend [KUNDE_C](kunde-c.md) prüfen.
 
 ## Fehlersuchmatrix
 
-| Symptom | Prüfen |
+| Problem | Erster Check |
 |---|---|
-| BGP-Session down | IPv6-Reachability, ASN, `update-source`, AF-Aktivierung |
-| BGP up, kein VPNv4-Prefix | Statische Route tatsächlich in VRF-RIB? `redistribute static`? |
-| VPNv4 da, kein Import | Route Target auf beiden PEs, RD, VRF-AF |
-| Keine Service-SID | Locator-Kapazität, SRv6-BGP-Konfiguration, Image-/Plattform-Unterstützung |
-| VRF-Routen da, Ping scheitert | SRv6-Datenebene, CE-Gateway und Rückroute, MTU, Filter |
-| Nur bei Ausfall Probleme | IS-IS-Unterlay, TI-LFA-Backup und Konvergenz separat untersuchen |
+| BGP VPNv4 down | IPv6-Transport, Loopback0, AS 65000, Update Source |
+| BGP steht, keine Routen | Statische VRF-Routen, BGP-Redistribution, RT |
+| Keine SRv6-Service-SID | Locator, `alloc mode per-vrf`, Image-/Plattformunterstützung |
+| Kein Ping | VRF-RIB, CE-VRF-Lite, Rückroute, SRv6-Forwarding |
+| Unterschiedliche Mandanten erreichbar | Route-Target-Import, Route Leaking, CE-Routingtabellen |
 
-!!! danger "Nicht verwechseln"
-    Ein funktionierendes MP-BGP VPNv4 beweist **nicht**, dass SRv6-L3VPN in der virtuellen XRv-9000-Datenebene funktioniert. Der Erfolgsnachweis erfordert eine tatsächlich weiterleitende uDT4-SID und beidseitigen Kundendatenverkehr.
+!!! danger "BGP-Routen sind kein Forwarding-Beweis"
+    Erst die tatsächliche Service-SID (uDT4) und **beidseitigen IPv4-Verkehr** über SRv6 bestätigen. XRv-9000-Support ist hier nicht allein durch die dokumentierte IOS-XR-Syntax bewiesen.
