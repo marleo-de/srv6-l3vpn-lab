@@ -55,7 +55,11 @@ commit
 !!! danger "VRF-Zuweisung kann Adressen entfernen"
     IOS XR kann die IPv4-Adresse beim Wechsel von globaler Tabelle in VRF entfernen. Die bestehende Konfiguration vorher sichern. Das Unterlay (IS-IS) nicht an die CE-Interfaces hängen.
 
-## 3. Statische PE-Routen zu den Testnetzen
+## 3. Vorläufiger statischer Basistest – **nicht** das Zielrouting
+
+Die folgenden Routen sind nur optional für einen isolierten SRv6-Basistest. Für die eigentliche Lab-Erweiterung ist **eBGP PE–CE** vorgesehen. Nicht gleichzeitig blind mit dynamisch gelernten Präfixen konfigurieren.
+
+## 3.1 Statische PE-Routen zu den Testnetzen
 
 **XRv-5 – Client-51 ist über `10.5.51.51` erreichbar:**
 
@@ -85,6 +89,8 @@ router static
 commit
 ```
 
+Für das geplante eBGP-Routing siehe [BGP-Design](bgp-plan.md).
+
 ## 4. MP-BGP VPNv4 und SRv6-Service-SIDs
 
 **XRv-5:**
@@ -105,6 +111,7 @@ router bgp 65000
   rd 65000:51
   address-family ipv4 unicast
    redistribute static
+   ! Nur für statischen Vorabtest; für eBGP später BGP-CE-Routen exportieren
    segment-routing srv6
     locator LABlocator
     alloc mode per-vrf
