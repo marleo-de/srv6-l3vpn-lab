@@ -33,7 +33,7 @@ Andere Routerversionen sind anhand der bislang vorliegenden Ausgaben nicht einze
 6. [Verifikation, Isolation und Fehlersuche](verifikation.md)
 
 !!! warning "Noch nicht vollständig geprüft"
-    Auf XRv-5 kennen wir **die tatsächliche IP des PE-Ports Gi0/0/0/4 noch nicht**. Auch die XRv-9000-Unterstützung für SRv6-uDT4-Datenebenenweiterleitung ist in diesem Lab noch nachzuweisen. Die Beispielblöcke dürfen nicht vor den dokumentierten Vorprüfungen übernommen werden.
+    XRv-5 `Gi0/0/0/4 = 10.5.51.5/24` und Client-51 `Gi0/0 = 10.5.51.51/24` sind bestätigt. Auch die XRv-9000-Unterstützung für SRv6-uDT4-Datenebenenweiterleitung ist in diesem Lab noch nachzuweisen. Die Beispielblöcke dürfen nicht vor den dokumentierten Vorprüfungen übernommen werden.
 
 ## Grundlage
 
