@@ -2,6 +2,16 @@
 
 **Cisco XRv 9000 · IOS XR 25.1.1 · IS-IS Level 2 · SRv6 uSID · MP-BGP VPNv4**
 
+## Bestätigte Router-Images
+
+| Funktion | Plattform | Software |
+|---|---|---|
+| P- und PE-Router | Cisco IOS XRv 9000 | IOS XR 25.1.1 (`show version` auf XRv-3 bestätigt) |
+| Client-/CE-Router | Cisco IOSv | IOS 15.9(3)M4, Image `vios-adventerprisek9-m` (`show version` auf Client-11 bestätigt) |
+
+Auf den PE-Routern wird mit `configure` und `commit` gearbeitet, auf den IOSv-Clients mit klassischer IOS-Konfiguration (`configure terminal`). Die Versionen sind für die gezeigten Geräte belegt; auf weiteren Routern gegebenenfalls ebenfalls `show version` prüfen.
+
+
 Diese Dokumentation erweitert den bereits durchgeführten SRv6-Leitfaden um ein **IPv4 Layer-3-VPN über SRv6**. Das bestehende Underlay bleibt erhalten.
 
 ## Zielbild
