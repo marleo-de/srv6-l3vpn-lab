@@ -1,6 +1,6 @@
 # VRF KUNDE_A – Client-51 ↔ Client-101
 
-**PE-Paar:** XRv-5 ↔ XRv-10. **Route Target:** `65000:100`. **Provider-AS:** `65000`.
+**PE-Paar:** XRv-5 ↔ XRv-10; **VPNv4-Control-Plane über RR XRv-6**. **Route Target:** `65000:100`. **Provider-AS:** `65000`.
 
 !!! warning "Vor der Konfiguration prüfen"
     XRv-5 `Gi0/0/0/4 = 10.5.51.5/24`, Client-51 `Gi0/0 = 10.5.51.51/24` und Loopback104 `51.1.0.1/16` sind nun per Screenshot bestätigt. Die VRF-Zuweisung kann die bisherige Interface-IP entfernen; die Adresse im selben Änderungsschritt wieder setzen. SRv6-uDT4-Funktion auf XRv 9000 bleibt separat zu prüfen.
@@ -91,7 +91,9 @@ commit
 
 Für das geplante eBGP-Routing siehe [BGP-Design](bgp-plan.md).
 
-## 4. MP-BGP VPNv4 und SRv6-Service-SIDs
+## 4. MP-BGP VPNv4 via XRv-6 und SRv6-Service-SIDs
+
+**Voraussetzung:** XRv-6 ist als [VPNv4 Route Reflector](route-reflector.md) eingerichtet. Die Peers zeigen auf XRv-6 und **nicht direkt auf den gegenüberliegenden PE**.
 
 **XRv-5:**
 
@@ -101,7 +103,7 @@ router bgp 65000
  bgp router-id 1.1.1.5
  address-family vpnv4 unicast
  !
- neighbor 2001:db8:1:1::10
+ neighbor 2001:db8:1:1::6
   remote-as 65000
   update-source Loopback0
   address-family vpnv4 unicast
@@ -130,7 +132,7 @@ router bgp 65000
  bgp router-id 1.1.1.10
  address-family vpnv4 unicast
  !
- neighbor 2001:db8:1:1::5
+ neighbor 2001:db8:1:1::6
   remote-as 65000
   update-source Loopback0
   address-family vpnv4 unicast
