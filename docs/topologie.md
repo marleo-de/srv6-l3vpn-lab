@@ -71,6 +71,24 @@ Screenshot der laufenden Konfiguration:
 
 Die Verbindung `XRv-1 Gi0/0/0/4 ↔ Client-11 Gi0/0` besitzt damit das vorhandene Netz **10.1.11.0/24** (PE `.1`, CE `.11`). Beim späteren Umhängen nach VRF `KUNDE_A` die IP-Adresse in der VRF wieder einrichten und bestehende global geroutete Abhängigkeiten beachten. Interface `Gi0/0/0/5` muss für `KUNDE_B` explizit aktiviert werden.
 
+## Bestätigte PE-/CE-Seite: XRv-10 und Client-101
+
+| Gerät | Interface | IPv4 | Konfigurationsstatus |
+|---|---|---|---|
+| XRv-10 | `Gi0/0/0/4` | `10.10.101.10/24` | Beschreibung `Client-101 Gi0/0`; kein Shutdown im gezeigten Block |
+| Client-101 | `Gi0/0` | `10.10.101.101/24` | Beschreibung `XRv-10 Gi4` |
+| XRv-10 | `Gi0/0/0/5` | keine | `shutdown` |
+| Client-101 | `Gi0/1` | keine | `shutdown` |
+| Client-101 | `Loopback104` | `101.1.0.1/16` | Beschreibung `advertise to PE`; IPv4-Testnetz `101.1.0.0/16` |
+| Client-101 | `Loopback106` | `2001:0:101::1/48` | IPv6-Testnetz |
+
+**Bestätigte KUNDE_A-Verbindungen (Ist-Zustand):**
+
+- XRv-1 ↔ Client-11: `10.1.11.1/24` ↔ `10.1.11.11/24`, Testnetz `11.1.0.0/16`.
+- XRv-10 ↔ Client-101: `10.10.101.10/24` ↔ `10.10.101.101/24`, Testnetz `101.1.0.0/16`.
+
+Die beiden `Gi0/0/0/5`-Ports sind für KUNDE_B vorgesehen, aktuell aber **shutdown**. Auf Client-101 ist auch `Gi0/1` shutdown.
+
 ## Neue Kundennetz-Adressen (ursprünglicher Vorschlag – noch nicht anwenden)
 
 | Einstellung | Wert |
