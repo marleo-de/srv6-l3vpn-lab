@@ -16,11 +16,11 @@ show running-config router bgp 65000
 
 ```cisco
 show route vrf KUNDE_A
-show route vrf KUNDE_A 192.168.101.0/24
-show route vrf KUNDE_A 192.168.11.0/24
+show route vrf KUNDE_A 101.1.0.0/16
+show route vrf KUNDE_A 11.1.0.0/16
 ```
 
-Auf XRv-1 sollte `192.168.11.0/24` lokal (statisch) und `192.168.101.0/24` remote (BGP) erscheinen; auf XRv-10 umgekehrt.
+Auf XRv-1 sollte `11.1.0.0/16` lokal (statisch) und `101.1.0.0/16` remote (BGP) erscheinen; auf XRv-10 umgekehrt.
 
 ## Test 3: SRv6-Service-SID
 
@@ -42,6 +42,8 @@ show bgp vpnv4 unicast
 ## Getrennte Mandanten prüfen
 
 Nach Einrichtung der [zweiten VRF KUNDE_B](kunde-b.md) sicherstellen, dass Routen mit RT `65000:200` **nicht** in `KUNDE_A` erscheinen. Kundentests zwischen A und B müssen ohne Route Leaking fehlschlagen. Auch die beiden CE-Anschlüsse müssen durch getrennte Routingtabellen isoliert sein.
+
+Für die neue VRF siehe [KUNDE_C – Client-41 und Client-71](kunde-c.md).
 
 ## Fehlersuchmatrix
 
