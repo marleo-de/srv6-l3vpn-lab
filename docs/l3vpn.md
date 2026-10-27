@@ -32,6 +32,9 @@ show running-config vrf KUNDE_A
 !!! danger "Ist-Konfiguration beachten"
     Client-11 hat laut aktueller Konfiguration bereits `Gi0/0 = 10.1.11.11/24` und `Loopback104 = 11.1.0.1/16`. Die folgenden Adressen `172.16.11.1/30` / `172.16.11.2/30` und das Netz `192.168.11.0/24` sind **nur alte Planungsvorschläge**. Nicht auf XRv-1/Client-11 übernehmen, bevor dessen bestehende PE-Port-Adresse geprüft und ein endgültiger Adressplan festgelegt wurde. Es ist sinnvoller, das vorhandene CE-Testpräfix beizubehalten.
 
+!!! warning "Endgültiger Ist-Adressplan für KUNDE_A"
+    Beide PE–CE-Links und Testnetze sind nun aus Gerätekonfigurationen bekannt: XRv-1 `10.1.11.1/24` ↔ Client-11 `10.1.11.11/24`, Testnetz `11.1.0.0/16`; XRv-10 `10.10.101.10/24` ↔ Client-101 `10.10.101.101/24`, Testnetz `101.1.0.0/16`. Die folgenden ursprünglichen `172.16.x`-Beispiele sind **nicht** der Ist-Zustand und dürfen nicht ohne Anpassung angewendet werden.
+
 ## 2. Kundenseitige Interfaces
 
 **XRv-1** – Port 4 aus der PDF, vorab Status prüfen:
