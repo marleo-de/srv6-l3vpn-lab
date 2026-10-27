@@ -18,11 +18,14 @@ markdown_extensions:
   - pymdownx.superfences
   - tables
 nav:
-  - Start: index.md
-  - Topologie & Adressen: topologie.md
-  - Underlay prüfen: underlay.md
-  - L3VPN konfigurieren: l3vpn.md
-  - Zweite VRF KUNDE_B: kunde-b.md
-  - Dritte VRF KUNDE_C (Client-41/71): kunde-c.md
-  - Verifikation & Fehlersuche: verifikation.md
-  - Weitere Ausbaustufen: erweiterungen.md
+  - Startseite: index.md
+  - Grundlagen:
+      - Topologie & Adressplan: topologie.md
+      - SRv6-Underlay prüfen: underlay.md
+  - VPN-Dienste:
+      - "VRF KUNDE_A · Client-51 ↔ 101": l3vpn.md
+      - "VRF KUNDE_B · Client-51 ↔ 101": kunde-b.md
+      - "VRF KUNDE_C · Client-41 ↔ 71": kunde-c.md
+  - Tests & Ausbau:
+      - Verifikation & Fehlersuche: verifikation.md
+      - Weitere Ausbaustufen: erweiterungen.md
