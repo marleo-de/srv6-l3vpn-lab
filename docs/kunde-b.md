@@ -5,6 +5,9 @@ Nach erfolgreichem [Basistest KUNDE_A](l3vpn.md) fügen wir auf **XRv-1** und **
 !!! warning "Vorab: Client-11 und Client-101 sind jeweils gemeinsam angeschlossene CE-Router"
     An jedem CE enden nun zwei Leitungen (Port 4 für KUNDE_A, Port 5 für KUNDE_B). **Beide Kunden dürfen auf dem CE nicht in derselben globalen Routingtabelle landen.** Für echte Isolation müssen die Client-Router VRF-Lite oder getrennte logische Router-Kontexte unterstützen. Falls das nicht möglich ist, für KUNDE_B jeweils einen separaten CE-Router einsetzen. Nur eine zweite VRF auf dem PE reicht für die vollständige Ende-zu-Ende-Isolation nicht.
 
+!!! note "Bestätigte CE-Ausgangslage"
+    Auf **Client-11** zeigt die vorliegende Konfiguration `Gi0/0 = 10.1.11.11/24`, `Gi0/1` noch **ohne IPv4-Adresse**, `Loopback104 = 11.1.0.1/16` und `Loopback106 = 2001:0:11::1/48`. Für KUNDE_B kann der zweite physische CE-Port genutzt werden. **Die bestehende KUNDE_A-Adressierung bitte nicht durch die ursprünglichen Beispiele ersetzen.** Eine VRF-Zuordnung auf dem IOSv-CE kann vorhandene IPv4-Adressen entfernen und muss deshalb geplant erfolgen.
+
 ## 1. Neuer Adressplan
 
 Die CE-Portnummern ergeben sich aus **Seite 3** der vorhandenen Lab-PDF. Die IPv4-Adressen sind neue Beispiele; vor der Nutzung auf Konflikte prüfen.
