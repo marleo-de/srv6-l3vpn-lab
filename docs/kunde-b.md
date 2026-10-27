@@ -8,6 +8,9 @@ Nach erfolgreichem [Basistest KUNDE_A](l3vpn.md) fügen wir auf **XRv-1** und **
 !!! note "Bestätigte CE-Ausgangslage"
     Auf **Client-11** zeigt die vorliegende Konfiguration `Gi0/0 = 10.1.11.11/24`, `Gi0/1` noch **ohne IPv4-Adresse**, `Loopback104 = 11.1.0.1/16` und `Loopback106 = 2001:0:11::1/48`. Für KUNDE_B kann der zweite physische CE-Port genutzt werden. **Die bestehende KUNDE_A-Adressierung bitte nicht durch die ursprünglichen Beispiele ersetzen.** Eine VRF-Zuordnung auf dem IOSv-CE kann vorhandene IPv4-Adressen entfernen und muss deshalb geplant erfolgen.
 
+!!! note "Auch die zweite CE-Seite ist bestätigt"
+    XRv-10 `Gi0/0/0/4 = 10.10.101.10/24`, Client-101 `Gi0/0 = 10.10.101.101/24`, Loopback104 `101.1.0.1/16` und Loopback106 `2001:0:101::1/48`. Sowohl XRv-10 `Gi0/0/0/5` als auch Client-101 `Gi0/1` stehen auf `shutdown`. Port 5 und CE `Gi0/1` müssen für KUNDE_B bewusst aktiviert werden; die KUNDE_A-Adressen bleiben erhalten.
+
 ## 1. Neuer Adressplan
 
 Die CE-Portnummern ergeben sich aus **Seite 3** der vorhandenen Lab-PDF. Die IPv4-Adressen sind neue Beispiele; vor der Nutzung auf Konflikte prüfen.
