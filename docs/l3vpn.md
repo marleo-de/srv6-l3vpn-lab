@@ -1,7 +1,7 @@
 # Phase 2 – IPv4-L3VPN über SRv6
 
 !!! warning "Lab-Konfiguration – nicht blind einspielen"
-    Die CE-Interface-Nummern sind aus Seite 3 der PDF abgeleitet; die vorgeschlagenen IPv4-Adressen dagegen sind neu und müssen vor `commit` abgeglichen werden. Cisco dokumentiert die VPNv4/uDT4-Konfiguration für andere IOS-XR-Hardwarefamilien; XRv 9000 muss in diesem Lab praktisch geprüft werden.
+    Die CE-Ports stammen aus Seite 3; KUNDE_A-Adressen sind inzwischen aus den Screenshots bestätigt. Nur neue BGP-/VRF-/SRv6-Kommandos sind ungetestet. Cisco dokumentiert die VPNv4/uDT4-Konfiguration für andere IOS-XR-Hardwarefamilien; XRv 9000 muss in diesem Lab praktisch geprüft werden.
 
 ## 1. Kundenseitige VRF (beide PEs)
 
