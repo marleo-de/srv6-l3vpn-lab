@@ -22,6 +22,12 @@ Weitere direkt verbundene Clients aus derselben Grafik:
 
 Die roten Nummern sind **nicht** die letzten Ziffern der IPv4-Adressen. Vor der Konfiguration auf allen Ports `show interfaces brief` und `show running-config interface` prüfen.
 
+## Softwarestand
+
+- **XRv-3:** `show version` bestätigt Cisco IOS XRv 9000, IOS XR **25.1.1**.
+- **Client-11:** `show version` bestätigt Cisco IOSv **15.9(3)M4** (`vios-adventerprisek9-m`) mit zwei GigabitEthernet-Interfaces.
+- Die übrigen Router anhand ihres eigenen `show version` prüfen.
+
 ## Rollen für den Basistest
 
 | Knoten | Rolle | Bemerkung |
