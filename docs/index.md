@@ -1,46 +1,40 @@
 # SRv6 IPv4-L3VPN Lab
 
-**Cisco XRv 9000 · IOS XR 25.1.1 · IS-IS Level 2 · SRv6 uSID · MP-BGP VPNv4**
+**Cisco IOS XRv 9000 · IOS XR 25.1.1 · SRv6 uSID · IS-IS Level 2 · MP-BGP VPNv4**
 
-## Bestätigte Router-Images
+Diese Lab-Erweiterung ergänzt das bestehende SRv6-Underlay um **drei getrennte IPv4-L3VPN-Dienste**.
 
-| Funktion | Plattform | Software |
+## Standorte und Kundenzuordnung
+
+| VRF | PE links | CE links | PE rechts | CE rechts | Route Target |
+|---|---|---|---|---|---|
+| **KUNDE_A** | XRv-5 | Client-51 | XRv-10 | Client-101 | `65000:100` |
+| **KUNDE_B** | XRv-5 | Client-51 | XRv-10 | Client-101 | `65000:200` |
+| **KUNDE_C** | XRv-4 | Client-41 | XRv-7 | Client-71 | `65000:300` |
+
+**Client-11 / XRv-1 gehören nicht zu KUNDE_A oder KUNDE_B.** Die bisherige Client-11-Konfiguration ist für diese VPN-Dienste abgelöst, bleibt aber unverändert auf dem Lab-Gerät.
+
+## Bestätigte Plattformen
+
+| Funktion | Software | Nachweis |
 |---|---|---|
-| P- und PE-Router | Cisco IOS XRv 9000 | IOS XR 25.1.1 (`show version` auf XRv-3 bestätigt) |
-| Client-/CE-Router | Cisco IOSv | IOS 15.9(3)M4, Image `vios-adventerprisek9-m` (`show version` auf Client-11 bestätigt) |
+| Provider-Router | Cisco IOS XRv 9000, **IOS XR 25.1.1** | `show version` auf XRv-3 |
+| Client-/CE-Router | Cisco IOSv **15.9(3)M4** | `show version` auf Client-11 |
 
-Auf den PE-Routern wird mit `configure` und `commit` gearbeitet, auf den IOSv-Clients mit klassischer IOS-Konfiguration (`configure terminal`). Die Versionen sind für die gezeigten Geräte belegt; auf weiteren Routern gegebenenfalls ebenfalls `show version` prüfen.
-
-
-Diese Dokumentation erweitert den bereits durchgeführten SRv6-Leitfaden um ein **IPv4 Layer-3-VPN über SRv6**. Das bestehende Underlay bleibt erhalten.
-
-## Zielbild
-
-- Zwei zunächst aktive Provider-Edges: **XRv-1** und **XRv-10**
-- Zwei angeschlossene Kundengeräte: **Client-11** und **Client-101**
-- VRF **KUNDE_A**, BGP AS **65000**, Route Target **65000:100**
-- VPNv4-Routenaustausch via iBGP zwischen IPv6-Loopbacks
-- SRv6-Service-SID je VRF (**uDT4**) aus dem vorhandenen uSID-Locator
-- Test von VPN-Isolation, Datenebene und später TI-LFA/Flex-Algo
-
-!!! warning "Wichtiger Plattformhinweis"
-    Die Syntax orientiert sich an Cisco IOS XR 25.1.x-Dokumentation für NCS/ASR/8000-Plattformen. **XRv 9000 ist damit nicht als unterstützte SRv6-L3VPN-Datenebene bestätigt.** Die Anleitung ist ein zu verifizierender Lab-Entwurf; die Installation einer SRv6-uDT4-Service-SID und echte CE-zu-CE-Konnektivität sind harte Erfolgskriterien.
+Andere Routerversionen sind anhand der bislang vorliegenden Ausgaben nicht einzeln bestätigt. Auf PE gilt `configure` + `commit`; auf IOSv CE gilt `configure terminal` + `end`/`write memory`.
 
 ## Ablauf
 
-1. [Topologie, Rollen und Adressplan prüfen](topologie.md)
-2. [Vorhandenes Underlay verifizieren](underlay.md)
-3. [VRF, PE-Interfaces, MP-BGP und SRv6 konfigurieren](l3vpn.md)
-4. [Control-Plane und Datenebene prüfen](verifikation.md)
-5. [Zweite VRF KUNDE_B auf den zweiten CE-Ports](kunde-b.md)
-6. [Dritte VRF KUNDE_C – Client-41 und Client-71](kunde-c.md)
-7. [Weiterführende Testfälle](erweiterungen.md)
+1. [Topologie und tatsächliche/bisher unbekannte IP-Adressen](topologie.md)
+2. [SRv6-Underlay vor der Änderung testen](underlay.md)
+3. [KUNDE_A auf XRv-5 und XRv-10](l3vpn.md)
+4. [KUNDE_B auf denselben PEs, aber getrennten Ports](kunde-b.md)
+5. [KUNDE_C mit Client-41 und Client-71](kunde-c.md)
+6. [Verifikation, Isolation und Fehlersuche](verifikation.md)
 
-!!! info "Kennzeichnung"
-    Ist-Adressen und neue Beispiel-Adressen sind getrennt dokumentiert; Beispiele nicht ohne Prüfung übernehmen. Zuerst auf dem jeweiligen Gerät mit `show interfaces brief` beziehungsweise `show running-config interface` ermitteln.
+!!! warning "Noch nicht vollständig geprüft"
+    Auf XRv-5 kennen wir **die tatsächliche IP des PE-Ports Gi0/0/0/4 noch nicht**. Auch die XRv-9000-Unterstützung für SRv6-uDT4-Datenebenenweiterleitung ist in diesem Lab noch nachzuweisen. Die Beispielblöcke dürfen nicht vor den dokumentierten Vorprüfungen übernommen werden.
 
-## Dokumentationsgrundlage
+## Grundlage
 
-Ausgangs-PDF: *SRv6 LAB – Leitfaden / Notizen* (16 Seiten, bereitgestellt im Gespräch). Darin: IS-IS Level 2, LABlocator, Umstellung auf uSID, Flex-Algo 128 und TI-LFA. Abweichungen vom PDF werden in dieser Erweiterung als neue Vorschläge ausgewiesen.
-
-**Referenzen:** [Cisco NCS 5500 SRv6 Micro-SID Guide 25.x](https://www.cisco.com/c/en/us/td/docs/iosxr/ncs5500/segment-routing/25xx/configuration/guide/b-segment-routing-cg-ncs5500-25xx.pdf) · [Cisco ASR 9000 SRv6 Micro-SID Guide 25.x](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/25xx/segment-routing/configuration/guide/b-segment-routing-cg-asr9000-25xx/configure-srv6-micro-sid.html)
+Ausgangsmaterial: *SRv6 LAB – Leitfaden / Notizen*, 16 Seiten, einschließlich IS-IS, uSID, Flex-Algo und TI-LFA. [Topologie](topologie.md) trennt bestätigte Gerätekonfigurationen von neu vorgeschlagenen Werten.
