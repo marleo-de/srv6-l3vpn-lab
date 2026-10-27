@@ -60,6 +60,17 @@ Die roten Nummern sind **nicht** die letzten Ziffern der IPv4-Adressen. Vor der 
 
 **Wichtig:** Der tatsächliche IP-Wert auf XRv-1 Port 4 wurde noch nicht gezeigt. Für KUNDE_A sollen die vorhandenen Adressen möglichst bestehen bleiben. Die bisher vorgeschlagenen `172.16.11.0/30`-Adressen wären ein *Umbau*, nicht der Ist-Zustand. Ob Loopback104 bereits über ein Protokoll advertised wird, geht aus der gezeigten Konfiguration nicht hervor.
 
+## Bestätigte PE-Seite: XRv-1
+
+Screenshot der laufenden Konfiguration:
+
+| Interface | IPv4 | Konfigurationsstatus |
+|---|---|---|
+| `Gi0/0/0/4` | `10.1.11.1/24` | `description Client-11 Gi0/0`, CDP, IPv6 enable, kein shutdown |
+| `Gi0/0/0/5` | keine | `shutdown` |
+
+Die Verbindung `XRv-1 Gi0/0/0/4 ↔ Client-11 Gi0/0` besitzt damit das vorhandene Netz **10.1.11.0/24** (PE `.1`, CE `.11`). Beim späteren Umhängen nach VRF `KUNDE_A` die IP-Adresse in der VRF wieder einrichten und bestehende global geroutete Abhängigkeiten beachten. Interface `Gi0/0/0/5` muss für `KUNDE_B` explizit aktiviert werden.
+
 ## Neue Kundennetz-Adressen (ursprünglicher Vorschlag – noch nicht anwenden)
 
 | Einstellung | Wert |
